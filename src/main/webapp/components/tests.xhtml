@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Created by IntelliJ IDEA.
+  User: camunoz
+  Date: 6/11/14
+  Time: 9:17 AM
+-->
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://java.sun.com/jsf/html"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:rich="http://richfaces.org/rich"
+  xmlns:a4j="http://richfaces.org/a4j"
+  xmlns:z="http://java.sun.com/jsf/composite/zanata">
+
+<h:head>
+  <title>Tests for Seam 2 replacements</title>
+</h:head>
+
+<h:body>
+  <!-- s:div replacement -->
+  <h:panelGroup id="container" rendered="true" layout="block">
+    This should generate a div element
+  </h:panelGroup>
+
+  <!-- Form ajax validation -->
+  <h:form>
+    <z:field id="validateableField">
+      <h:inputText value="#{myViewBean.name}" required="true">
+        <a4j:ajax event="blur" render="validateableField" data="@this"/>
+      </h:inputText>
+    </z:field>
+    <z:field id="validateableField2">
+      <h:inputText value="#{myViewBean.age}" required="true">
+        <a4j:ajax event="blur" render="validateableField2" data="@this"/>
+      </h:inputText>
+    </z:field>
+    <h:commandButton action="#{myViewBean.printName()}" value="Validate"/>
+  </h:form>
+
+</h:body>
+
+</html>

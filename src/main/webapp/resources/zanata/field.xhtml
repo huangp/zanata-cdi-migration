@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:cc="http://java.sun.com/jsf/composite"
+  xmlns:c="http://java.sun.com/jsp/jstl/core">
+<head>
+  <title>This will not be present in rendered output</title>
+</head>
+
+<body>
+
+<cc:interface componentType="org.jboss.seam.faces.InputContainer"/>
+
+<cc:implementation>
+  <div id="#{cc.clientId}" class="prop">
+
+    <h:outputLabel name="#{cc.attrs.invalid?'errors':''}">
+      <ui:insert name="label"/>
+      <h:panelGroup styleClass="required"
+        rendered="#{cc.attrs.required}">*</h:panelGroup>
+    </h:outputLabel>
+
+    <span class="value #{cc.attrs.invalid?'errors':''}">
+        <f:validateBean>
+          <cc:insertChildren/>
+        </f:validateBean>
+    </span>
+
+    <h:panelGroup class="value #{cc.attrs.invalid?'errors':''} errorsMessage">
+      <h:panelGroup styleClass="icon-cancel-circle-2 errors" rendered="#{cc.attrs.invalid}"/>
+      <h:message styleClass="errors"/>
+    </h:panelGroup>
+  </div>
+</cc:implementation>
+
+</body>
+
+</html> 

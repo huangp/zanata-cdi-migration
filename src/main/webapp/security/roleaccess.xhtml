@@ -1,0 +1,12 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core">
+<body>
+
+  <h:form>
+    <h:commandButton value="Authorized" action="#{myViewBean.doSomethingAuthorized}"/>
+    <h:commandButton value="Should fail" action="#{myViewBean.doSomethingUnauthorized()}"/>
+  </h:form>
+
+</body>
+</html>

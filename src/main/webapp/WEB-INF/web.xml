@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3.0" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+  <display-name>cdi-security</display-name>
+
+  <!-- Kerberos ticket based authentication settings -->
+
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>sign in</web-resource-name>
+      <url-pattern>/krb5/auth.xhtml</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>*</role-name>
+    </auth-constraint>
+  </security-constraint>
+  <login-config>
+    <auth-method>SPNEGO</auth-method>
+    <form-login-config>
+      <form-login-page>/krb5/kloginform.jsp</form-login-page>
+      <!-- Error page not needed since the login form takes over -->
+      <form-error-page>/</form-error-page>
+    </form-login-config>
+  </login-config>
+  <security-role>
+    <role-name>*</role-name>
+  </security-role>
+
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
+  <context-param>
+    <param-name>javax.faces.SKIP_COMMENTS</param-name>
+    <param-value>true</param-value>
+  </context-param>
+  <context-param>
+    <param-name>returnURL</param-name>
+    <param-value>http://localhost:8080/cdi-security/index.xhtml</param-value>
+  </context-param>
+  <servlet>
+    <servlet-name>OpenIdConsumer</servlet-name>
+    <servlet-class>org.picketlink.social.standalone.openid.servlets.OpenIDConsumerServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OpenIdConsumer</servlet-name>
+    <url-pattern>/openid</url-pattern>
+  </servlet-mapping>
+  <welcome-file-list>
+    <welcome-file>faces/index.xhtml</welcome-file>
+  </welcome-file-list>
+  <servlet>
+    <servlet-name>Faces Servlet</servlet-name>
+    <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Faces Servlet</servlet-name>
+    <url-pattern>*.xhtml</url-pattern>
+    <url-pattern>/faces/*</url-pattern>
+  </servlet-mapping>
+</web-app>

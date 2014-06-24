@@ -1,0 +1,23 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core">
+<body>
+<ui:fragment rendered="#{not identity.loggedIn}">
+  Please, enter your credentials:<br/><br/>
+  <h:form>
+    Username: <h:inputText value="#{loginCredentials.userId}"
+    required="true"/><br/>
+    Password: <h:inputSecret value="#{loginCredentials.password}"
+    required="true"/><br/>
+    <h:commandButton value="Finish" action="#{authenticationBean.authenticateInternal}"/>
+  </h:form>
+</ui:fragment>
+<ui:fragment rendered="#{identity.loggedIn}">
+  <h3>Welcome #{identity.account.firstName} !</h3>
+  <h:form>
+    <p>Click here to <h:commandLink
+      action="#{identity.logout}">logout</h:commandLink>.</p>
+  </h:form>
+</ui:fragment>
+</body>
+</html>
