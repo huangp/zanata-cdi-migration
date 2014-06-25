@@ -18,34 +18,36 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.test.cdi;
+package org.zanata.test.bean;
 
-import org.junit.Test;
-import org.zanata.test.CdiTest;
-import org.zanata.test.bean.CoffeeBean;
-import org.zanata.test.bean.TreeBean;
+import java.util.concurrent.Future;
 
 import javax.inject.Inject;
 
+import org.apache.deltaspike.cdise.weld.WeldContextControl;
+import org.apache.deltaspike.core.api.provider.BeanManagerProvider;
+import org.jglue.cdiunit.AdditionalClasses;
+import org.jglue.cdiunit.CdiRunner;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.zanata.async.AsyncMethodInterceptor;
+import org.zanata.bean.AsyncMethodsBean;
+
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
- * TODO Seems to have stopped working since the introduction of CdiUnit
  */
-public class BasicCdiTest extends CdiTest {
+@RunWith(CdiRunner.class)
+@AdditionalClasses({AsyncMethodInterceptor.class, BeanManagerProvider.class,
+        WeldContextControl.class})
+public class AsyncMethodsBeanTest {
 
     @Inject
-    private CoffeeBean injectedBean;
-
-    @Inject
-    private TreeBean treeBean;
+    AsyncMethodsBean asyncBean;
 
     @Test
-    public void basicInjectionOnTestClass() throws Exception {
-        assert injectedBean.getName().equals(CoffeeBean.class.getName());
-    }
-
-    @Test
-    public void multiLevelInjection() throws Exception {
-        assert treeBean.getCoffeeBean().getName().equals(CoffeeBean.class.getName());
+    public void testAsync() throws Exception {
+        Future<String> future = asyncBean.longWindedString("Carlos");
+        assert !future.isDone();
+        assert future.get().length() > 0;
     }
 }

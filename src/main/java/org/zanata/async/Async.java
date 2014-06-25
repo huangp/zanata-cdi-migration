@@ -18,34 +18,24 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.test.cdi;
+package org.zanata.async;
 
-import org.junit.Test;
-import org.zanata.test.CdiTest;
-import org.zanata.test.bean.CoffeeBean;
-import org.zanata.test.bean.TreeBean;
-
-import javax.inject.Inject;
+import javax.interceptor.InterceptorBinding;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
- * TODO Seems to have stopped working since the introduction of CdiUnit
+ * Marks a method as running asynchronously. This means the actual method
+ * execution will happen in its own thread. Methods marked with this annotation
+ * must return an object of type {@link java.util.concurrent.Future}
+ * 
+ * @author Carlos Munoz <a
+ *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-public class BasicCdiTest extends CdiTest {
-
-    @Inject
-    private CoffeeBean injectedBean;
-
-    @Inject
-    private TreeBean treeBean;
-
-    @Test
-    public void basicInjectionOnTestClass() throws Exception {
-        assert injectedBean.getName().equals(CoffeeBean.class.getName());
-    }
-
-    @Test
-    public void multiLevelInjection() throws Exception {
-        assert treeBean.getCoffeeBean().getName().equals(CoffeeBean.class.getName());
-    }
+@InterceptorBinding
+@Target(value = { ElementType.METHOD, ElementType.TYPE })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Async {
 }

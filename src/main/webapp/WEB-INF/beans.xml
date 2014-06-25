@@ -5,5 +5,6 @@
 
   <interceptors>
     <class>org.apache.deltaspike.security.impl.extension.SecurityInterceptor</class>
+    <class>org.zanata.async.AsyncMethodInterceptor</class>
   </interceptors>
 </beans>

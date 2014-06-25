@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Red Hat, Inc. and individual contributors as indicated by the
+ * Copyright 2013, Red Hat, Inc. and individual contributors as indicated by the
  * @author tags. See the copyright.txt file in the distribution for a full
  * listing of individual contributors.
  *
@@ -18,34 +18,28 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.test.cdi;
+package org.zanata.async;
 
-import org.junit.Test;
-import org.zanata.test.CdiTest;
-import org.zanata.test.bean.CoffeeBean;
-import org.zanata.test.bean.TreeBean;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.inject.Inject;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+
+import javax.annotation.Nonnull;
 
 /**
- * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
- * TODO Seems to have stopped working since the introduction of CdiUnit
+ * Public common class for all asynchronous tasks in the system.
+ *
+ * @param <V>
+ *            The type of value returned by this task once finished.
+ *
+ * @author Carlos Munoz <a
+ *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-public class BasicCdiTest extends CdiTest {
+public abstract class AsyncTask<V> implements Callable<V> {
 
-    @Inject
-    private CoffeeBean injectedBean;
+    @Getter @Setter
+    private Future<V> future;
 
-    @Inject
-    private TreeBean treeBean;
-
-    @Test
-    public void basicInjectionOnTestClass() throws Exception {
-        assert injectedBean.getName().equals(CoffeeBean.class.getName());
-    }
-
-    @Test
-    public void multiLevelInjection() throws Exception {
-        assert treeBean.getCoffeeBean().getName().equals(CoffeeBean.class.getName());
-    }
 }

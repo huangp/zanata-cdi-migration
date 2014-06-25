@@ -18,34 +18,32 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.test.cdi;
+package org.zanata.async;
 
-import org.junit.Test;
-import org.zanata.test.CdiTest;
-import org.zanata.test.bean.CoffeeBean;
-import org.zanata.test.bean.TreeBean;
+import com.google.common.util.concurrent.AbstractFuture;
 
-import javax.inject.Inject;
+import javax.annotation.Nullable;
+import java.util.concurrent.Future;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
- * TODO Seems to have stopped working since the introduction of CdiUnit
  */
-public class BasicCdiTest extends CdiTest {
+public class AsyncTaskResult<V> extends AbstractFuture<V> {
 
-    @Inject
-    private CoffeeBean injectedBean;
-
-    @Inject
-    private TreeBean treeBean;
-
-    @Test
-    public void basicInjectionOnTestClass() throws Exception {
-        assert injectedBean.getName().equals(CoffeeBean.class.getName());
+    public AsyncTaskResult() {
     }
 
-    @Test
-    public void multiLevelInjection() throws Exception {
-        assert treeBean.getCoffeeBean().getName().equals(CoffeeBean.class.getName());
+    public AsyncTaskResult(V value) {
+        set(value);
+    }
+
+    @Override
+    public boolean set(@Nullable V value) {
+        return super.set(value);
+    }
+
+    @Override
+    public boolean setException(Throwable throwable) {
+        return super.setException(throwable);
     }
 }

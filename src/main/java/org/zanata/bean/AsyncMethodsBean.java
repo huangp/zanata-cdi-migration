@@ -18,34 +18,31 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.test.cdi;
+package org.zanata.bean;
 
-import org.junit.Test;
-import org.zanata.test.CdiTest;
-import org.zanata.test.bean.CoffeeBean;
-import org.zanata.test.bean.TreeBean;
+import com.google.common.util.concurrent.ListenableFuture;
+import org.zanata.async.Async;
+import org.zanata.async.AsyncTaskResult;
 
-import javax.inject.Inject;
+import java.util.concurrent.Future;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
- * TODO Seems to have stopped working since the introduction of CdiUnit
  */
-public class BasicCdiTest extends CdiTest {
+public class AsyncMethodsBean {
 
-    @Inject
-    private CoffeeBean injectedBean;
-
-    @Inject
-    private TreeBean treeBean;
-
-    @Test
-    public void basicInjectionOnTestClass() throws Exception {
-        assert injectedBean.getName().equals(CoffeeBean.class.getName());
+    @Async
+    public ListenableFuture<String> longWindedString(String name) {
+        for(int i =0; i<10; i++) {
+            try {
+                Thread.sleep(1000);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Sleeping... zzz");
+        }
+        return new AsyncTaskResult<String>("Hello " + name + "! I slept for 10 seconds");
     }
 
-    @Test
-    public void multiLevelInjection() throws Exception {
-        assert treeBean.getCoffeeBean().getName().equals(CoffeeBean.class.getName());
-    }
 }
