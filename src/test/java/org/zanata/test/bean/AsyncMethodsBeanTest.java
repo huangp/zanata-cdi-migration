@@ -28,10 +28,15 @@ import org.apache.deltaspike.cdise.weld.WeldContextControl;
 import org.apache.deltaspike.core.api.provider.BeanManagerProvider;
 import org.jglue.cdiunit.AdditionalClasses;
 import org.jglue.cdiunit.CdiRunner;
+import org.jglue.cdiunit.InRequestScope;
+import org.jglue.cdiunit.InSessionScope;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.zanata.async.AsyncMethodInterceptor;
+import org.zanata.async.AsyncTaskHandle;
+import org.zanata.async.AsyncTaskHandleManager;
 import org.zanata.bean.AsyncMethodsBean;
+import org.zanata.bean.SessionStorageBean;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
@@ -44,10 +49,41 @@ public class AsyncMethodsBeanTest {
     @Inject
     AsyncMethodsBean asyncBean;
 
+    @Inject
+    SessionStorageBean storageBean;
+
+    @Inject
+    AsyncTaskHandleManager handleManager;
+
     @Test
     public void testAsync() throws Exception {
         Future<String> future = asyncBean.longWindedString("Carlos");
         assert !future.isDone();
         assert future.get().length() > 0;
+    }
+
+    @Test
+    @InRequestScope // @InSessionScope doesn't seem to initialize the scope
+    public void testSessionIsShared() throws Exception {
+        String str = "Stored String";
+        storageBean.put("VALUE", str);
+        Future<String> result = asyncBean.getSessionStoredValue();
+        assert result.get().equals(str);
+    }
+
+    @Test
+    public void testHandleManagerRegistration() throws Exception {
+        AsyncTaskHandle handle = handleManager.newTaskHandle();
+        Future<String> result = asyncBean.getLongWindedString("Carlos", handle);
+        // task shouldn't be done here
+        assert !result.isDone();
+        assert !handle.isDone();
+        assert handleManager.getHandleById( handle.getId() ).equals( handle );
+        // wait for task to finish
+        assert result.get() != null;
+        // task should be done here
+        assert result.isDone();
+        assert handle.isDone();
+        assert handleManager.getHandleById( handle.getId() ).equals( handle );
     }
 }

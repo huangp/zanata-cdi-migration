@@ -20,6 +20,8 @@
  */
 package org.zanata.async;
 
+import com.google.common.base.Optional;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 
 import javax.inject.Inject;
@@ -28,40 +30,75 @@ import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
 /**
- * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
+ * TODO Constructor injection did not seem to work on interceptors
+ * @author Carlos Munoz <a
+ *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @Async
 @Interceptor
 public class AsyncMethodInterceptor {
 
+    static final ThreadLocal<Boolean> interceptorRan =
+            new ThreadLocal<Boolean>();
     @Inject
-    private AsynchronousTaskManager executor;
+    private AsynchronousTaskManager taskManager;
 
-    static final ThreadLocal<Boolean> interceptorRan = new ThreadLocal<Boolean>();
+    @Inject
+    private AsyncTaskHandleManager taskHandleManager;
 
     @AroundInvoke
     public Object callAsync(final InvocationContext ctx) throws Exception {
 
         if (interceptorRan.get() == null) {
+            // If there is a Task handle parameter (only the first one will be
+            // registered)
+            final Optional<AsyncTaskHandle> handle =
+                    Optional.fromNullable(findHandleIfPresent(ctx
+                            .getParameters()));
+
             AsyncTask asyncTask = new AsyncTask() {
                 @Override
                 public Object call() throws Exception {
                     interceptorRan.set(true);
                     try {
+                        if( handle.isPresent() ) {
+                            handle.get().startTiming();
+                        }
                         Object target =
-                                BeanProvider.getContextualReference(ctx.getMethod().getDeclaringClass(), false);
-                        return ctx.getMethod().invoke(target, ctx.getParameters());
+                                BeanProvider
+                                        .getContextualReference(ctx.getMethod()
+                                                .getDeclaringClass(), false);
+                        return ctx.getMethod().invoke(target,
+                                ctx.getParameters());
                     }
                     finally {
                         interceptorRan.remove();
+                        if (handle.isPresent()) {
+                            handle.get().finishTiming();
+                            taskHandleManager.taskFinished(handle.get());
+                        }
                     }
                 }
             };
 
-            return executor.startTask(asyncTask);
+            ListenableFuture<Object> futureResult =
+                    taskManager.startTask(asyncTask);
+            if( handle.isPresent() ) {
+                handle.get().setFutureResult(futureResult);
+            }
+            return futureResult;
             // Async methods should return ListenableFuture
         } else {
             return ctx.proceed();
         }
+    }
+
+    private AsyncTaskHandle findHandleIfPresent(Object[] params) {
+        for (Object param : params) {
+            if (param instanceof AsyncTaskHandle) {
+                return (AsyncTaskHandle) param;
+            }
+        }
+        return null;
     }
 }

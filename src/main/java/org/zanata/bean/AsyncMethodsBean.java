@@ -22,14 +22,23 @@ package org.zanata.bean;
 
 import com.google.common.util.concurrent.ListenableFuture;
 import org.zanata.async.Async;
+import org.zanata.async.AsyncTaskHandle;
 import org.zanata.async.AsyncTaskResult;
 
+import javax.inject.Inject;
 import java.util.concurrent.Future;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 public class AsyncMethodsBean {
+
+    private SessionStorageBean sessionStorageBean;
+
+    @Inject
+    public AsyncMethodsBean(SessionStorageBean sessionStorageBean) {
+        this.sessionStorageBean = sessionStorageBean;
+    }
 
     @Async
     public ListenableFuture<String> longWindedString(String name) {
@@ -43,6 +52,16 @@ public class AsyncMethodsBean {
             System.out.println("Sleeping... zzz");
         }
         return new AsyncTaskResult<String>("Hello " + name + "! I slept for 10 seconds");
+    }
+
+    @Async
+    public ListenableFuture<String> getSessionStoredValue() {
+        return new AsyncTaskResult<String>((String)sessionStorageBean.get("VALUE"));
+    }
+
+    @Async
+    public ListenableFuture<String> getLongWindedString(String name, AsyncTaskHandle handle) {
+        return this.longWindedString(name);
     }
 
 }

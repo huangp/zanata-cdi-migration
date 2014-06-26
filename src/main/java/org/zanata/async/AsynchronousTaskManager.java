@@ -30,6 +30,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.SessionScoped;
 
 import org.apache.deltaspike.cdise.api.ContextControl;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
@@ -64,8 +65,9 @@ public class AsynchronousTaskManager {
                 try {
                     ctxCtrl = BeanProvider
                             .getContextualReference(ContextControl.class);
-                    // All other scopes will be inherited (?)
-                    ctxCtrl.startContext(RequestScoped.class);
+                    ctxCtrl.startContexts();
+                    // TODO Security context. Make sure the new thread has the same
+                    // security identity as the one that created it.
 
                     Future<V> returnValue = task.call();
                     taskFuture.set(returnValue.get());
@@ -74,10 +76,10 @@ public class AsynchronousTaskManager {
                     taskFuture.setException(t);
                 }
                 finally {
-                    // stop the RequestContext to ensure that all request-scoped
+                    // stop the started contexts to ensure that all scoped
                     // beans get cleaned up.
                     if(ctxCtrl != null) {
-                        ctxCtrl.stopContext(RequestScoped.class);
+                        ctxCtrl.stopContexts();
                     }
                 }
             }
