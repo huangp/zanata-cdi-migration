@@ -18,16 +18,34 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.model.security.authenticator;
+package org.zanata.security.openid;
 
-import org.picketlink.authentication.BaseAuthenticator;
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-public class OpenIdAuthenticator extends BaseAuthenticator {
-    @Override
-    public void authenticate() {
+@WebServlet(urlPatterns = "/openid/auth")
+public class OpenIdConsumerServlet extends HttpServlet {
 
+    @Inject
+    private OpenIdAuthenticationManager openIdAuthManager;
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        try {
+            openIdAuthManager.initiateAuthentication(
+                    req.getParameter("openid"), req, resp);
+        }
+        catch (Exception e) {
+            throw new ServletException(e);
+        }
     }
 }

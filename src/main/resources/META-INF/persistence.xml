@@ -45,8 +45,8 @@
     <!--<class>org.zanata.model.po.HPoHeader</class>-->
     <!--<class>org.zanata.model.po.HPoTargetHeader</class>-->
     <!--<class>org.zanata.model.po.HPotEntryData</class>-->
-    <class>org.zanata.model.security.HCredentials</class>
-    <class>org.zanata.model.security.HOpenIdCredentials</class>
+    <class>org.zanata.security.HCredentials</class>
+    <class>org.zanata.security.HOpenIdCredentials</class>
     <!--<class>org.zanata.model.tm.TransMemoryUnit</class>-->
     <!--<class>org.zanata.model.tm.TransMemoryUnitVariant</class>-->
     <!--<class>org.zanata.model.tm.TransMemory</class>-->

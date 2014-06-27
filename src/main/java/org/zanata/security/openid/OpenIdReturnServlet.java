@@ -18,46 +18,34 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.bean;
+package org.zanata.security.openid;
 
-import static org.picketlink.Identity.AuthenticationResult;
-
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
-import javax.inject.Named;
-
-import lombok.Getter;
-
-import org.picketlink.Identity;
-import org.picketlink.credential.DefaultLoginCredentials;
-import org.zanata.security.authenticator.AuthenticatorSelector;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@RequestScoped
-@Named
-public class AuthenticationBean {
+@WebServlet(urlPatterns = "/openid/return")
+public class OpenIdReturnServlet extends HttpServlet {
 
     @Inject
-    @Getter
-    private DefaultLoginCredentials loginCredentials;
+    private OpenIdAuthenticationManager openIdAuthManager;
 
-    @Inject
-    private AuthenticatorSelector authenticatorSelector;
-    
-    @Inject
-    private Identity identity;
-
-    public void authenticateInternal() {
-        authenticatorSelector.setCredentials(loginCredentials);
-        AuthenticationResult result = identity.login();
-        if( result.equals( AuthenticationResult.SUCCESS )) {
-            // Put a faces message on screen
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        try {
+            openIdAuthManager.verifyResponse(req, resp);
+            resp.sendRedirect(req.getContextPath() + "/security/signin.xhtml");
         }
-        else {
-            throw new RuntimeException("Failed authentication");
+        catch (Exception e) {
+            throw new ServletException(e);
         }
     }
-
 }

@@ -22,7 +22,6 @@ package org.zanata.model;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -32,7 +31,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -55,7 +53,7 @@ import lombok.ToString;
 //import org.jboss.seam.annotations.security.management.UserPrincipal;
 //import org.jboss.seam.annotations.security.management.UserRoles;
 //import org.jboss.seam.security.management.PasswordHash;
-import org.zanata.model.security.HCredentials;
+import org.zanata.security.HCredentials;
 //import org.zanata.model.type.UserApiKey;
 //import org.zanata.rest.dto.Account;
 

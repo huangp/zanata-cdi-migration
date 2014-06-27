@@ -18,46 +18,35 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.bean;
+package org.zanata.security.authenticator;
 
-import static org.picketlink.Identity.AuthenticationResult;
-
-import javax.enterprise.context.RequestScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
-import javax.inject.Named;
 
-import lombok.Getter;
-
-import org.picketlink.Identity;
+import org.picketlink.authentication.BaseAuthenticator;
 import org.picketlink.credential.DefaultLoginCredentials;
-import org.zanata.security.authenticator.AuthenticatorSelector;
+import org.picketlink.idm.model.basic.User;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@RequestScoped
-@Named
-public class AuthenticationBean {
+public class InternalAuthenticator extends BaseAuthenticator {
 
     @Inject
-    @Getter
-    private DefaultLoginCredentials loginCredentials;
+    private DefaultLoginCredentials credentials;
 
-    @Inject
-    private AuthenticatorSelector authenticatorSelector;
-    
-    @Inject
-    private Identity identity;
+    @Override
+    public void authenticate() {
 
-    public void authenticateInternal() {
-        authenticatorSelector.setCredentials(loginCredentials);
-        AuthenticationResult result = identity.login();
-        if( result.equals( AuthenticationResult.SUCCESS )) {
-            // Put a faces message on screen
+        // TODO Check the database
+        if(credentials.getUserId().equals("carlos") && credentials.getPassword().equals("carlos")) {
+            setStatus(AuthenticationStatus.SUCCESS);
+            setAccount(new User("carlos"));
         }
         else {
-            throw new RuntimeException("Failed authentication");
+            setStatus(AuthenticationStatus.FAILURE);
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Authentication Failed"));
         }
     }
-
 }

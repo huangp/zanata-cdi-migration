@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Red Hat, Inc. and individual contributors as indicated by the
+ * Copyright 2014, Red Hat, Inc. and individual contributors as indicated by the
  * @author tags. See the copyright.txt file in the distribution for a full
  * listing of individual contributors.
  *
@@ -18,26 +18,14 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.model.security;
-
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-
-import lombok.NoArgsConstructor;
-
-import org.zanata.model.HAccount;
+package org.zanata.security.authenticator;
 
 /**
- * @author Carlos Munoz <a
- *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
+ * This is an authenticator that will authenticate a user without any password
+ * checks. It's meant to be used when an asynchronous task needs to run as if
+ * started by aun authenticated user.
+ *
+ * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@Entity
-@DiscriminatorValue("OPENID")
-@NoArgsConstructor
-public class HOpenIdCredentials extends HCredentials {
-    public HOpenIdCredentials(HAccount account, String user, String email) {
-        setAccount(account);
-        setUser(user);
-        setEmail(email);
-    }
+public class RunAsAuthenticator {
 }

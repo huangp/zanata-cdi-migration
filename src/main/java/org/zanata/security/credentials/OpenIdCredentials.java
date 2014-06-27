@@ -18,46 +18,31 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.bean;
-
-import static org.picketlink.Identity.AuthenticationResult;
-
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.inject.Named;
+package org.zanata.security.credentials;
 
 import lombok.Getter;
+import lombok.Setter;
+import org.picketlink.idm.credential.AbstractBaseCredentials;
 
-import org.picketlink.Identity;
-import org.picketlink.credential.DefaultLoginCredentials;
-import org.zanata.security.authenticator.AuthenticatorSelector;
+import javax.enterprise.context.RequestScoped;
+import java.io.Serializable;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @RequestScoped
-@Named
-public class AuthenticationBean {
+public class OpenIdCredentials extends AbstractBaseCredentials implements
+        Serializable {
 
-    @Inject
-    @Getter
-    private DefaultLoginCredentials loginCredentials;
+    @Getter @Setter
+    private String openId;
 
-    @Inject
-    private AuthenticatorSelector authenticatorSelector;
-    
-    @Inject
-    private Identity identity;
+    @Getter @Setter
+    private boolean authenticatedByProvider;
 
-    public void authenticateInternal() {
-        authenticatorSelector.setCredentials(loginCredentials);
-        AuthenticationResult result = identity.login();
-        if( result.equals( AuthenticationResult.SUCCESS )) {
-            // Put a faces message on screen
-        }
-        else {
-            throw new RuntimeException("Failed authentication");
-        }
+    @Override
+    public void invalidate() {
+        openId = null;
+        authenticatedByProvider = false;
     }
-
 }

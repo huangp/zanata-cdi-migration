@@ -18,58 +18,26 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.model.security;
+package org.zanata.security;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import org.zanata.model.HAccount;
-import org.zanata.model.ModelEntityBase;
-//import org.zanata.model.validator.Unique;
 
 /**
- * A set of credentials for a given user against an authentication mechanism.
- *
  * @author Carlos Munoz <a
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type",
-        discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("OPENID")
 @NoArgsConstructor
-//@Unique(properties = { "user" })
-public abstract class HCredentials extends ModelEntityBase {
-    @Setter
-    private HAccount account;
-
-    @Setter
-    private String user;
-
-    @Setter
-    private String email;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "account_id")
-    public HAccount getAccount() {
-        return account;
-    }
-
-    @Column(unique = true, nullable = false)
-    public String getUser() {
-        return user;
-    }
-
-    public String getEmail() {
-        return email;
+public class HOpenIdCredentials extends HCredentials {
+    public HOpenIdCredentials(HAccount account, String user, String email) {
+        setAccount(account);
+        setUser(user);
+        setEmail(email);
     }
 }

@@ -32,18 +32,11 @@
     <param-name>javax.faces.SKIP_COMMENTS</param-name>
     <param-value>true</param-value>
   </context-param>
+  <!-- For open id -->
   <context-param>
     <param-name>returnURL</param-name>
     <param-value>http://localhost:8080/cdi-security/index.xhtml</param-value>
   </context-param>
-  <servlet>
-    <servlet-name>OpenIdConsumer</servlet-name>
-    <servlet-class>org.picketlink.social.standalone.openid.servlets.OpenIDConsumerServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>OpenIdConsumer</servlet-name>
-    <url-pattern>/openid</url-pattern>
-  </servlet-mapping>
   <welcome-file-list>
     <welcome-file>faces/index.xhtml</welcome-file>
   </welcome-file-list>

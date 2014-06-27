@@ -18,7 +18,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.model.security.authenticator;
+package org.zanata.security.authenticator;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Instance;
@@ -32,6 +32,7 @@ import org.picketlink.annotations.PicketLink;
 import org.picketlink.authentication.Authenticator;
 import org.picketlink.credential.DefaultLoginCredentials;
 import org.picketlink.idm.credential.Credentials;
+import org.zanata.security.credentials.OpenIdCredentials;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
@@ -46,11 +47,17 @@ public class AuthenticatorSelector {
     @Inject
     private Instance<InternalAuthenticator> internalAuthenticator;
 
+    @Inject
+    private Instance<OpenIdAuthenticator> openIdAuthenticator;
+
     @Produces
     @PicketLink
     public Authenticator getAuthenticator() {
         if( credentials instanceof DefaultLoginCredentials) {
             return internalAuthenticator.get();
+        }
+        else if( credentials instanceof OpenIdCredentials) {
+            return openIdAuthenticator.get();
         }
         return null;
     }

@@ -1,10 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Created by IntelliJ IDEA.
-  User: camunoz
-  Date: 5/27/14
-  Time: 1:42 PM
--->
 <!DOCTYPE html
   PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -16,15 +9,15 @@
   xmlns:rich="http://richfaces.org/rich"
   xmlns:a4j="http://richfaces.org/a4j">
 
+<f:metadata>
+  <f:event type="preRenderView" listener="#{openIdAuthenticator.acceptOpenIdResponse}"/>
+</f:metadata>
+
 <h:head>
-  <title>Simple JSF Facelets page</title>
+  <title>Open Id return page</title>
 </h:head>
 
 <h:body>
-  <form action="#{request.contextPath}/openid/auth" method="post">
-    <input type="text" name="openid"></input>
-    <input type="submit" value="Authenticate"/>
-  </form>
 </h:body>
 
 </html>

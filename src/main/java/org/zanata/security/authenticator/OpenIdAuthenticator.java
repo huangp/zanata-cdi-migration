@@ -18,35 +18,31 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.model.security.authenticator;
-
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.inject.Inject;
+package org.zanata.security.authenticator;
 
 import org.picketlink.authentication.BaseAuthenticator;
-import org.picketlink.credential.DefaultLoginCredentials;
 import org.picketlink.idm.model.basic.User;
+import org.zanata.security.credentials.OpenIdCredentials;
+
+import javax.inject.Inject;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-public class InternalAuthenticator extends BaseAuthenticator {
+public class OpenIdAuthenticator extends BaseAuthenticator {
 
     @Inject
-    private DefaultLoginCredentials credentials;
+    private OpenIdCredentials credentials;
 
     @Override
     public void authenticate() {
-
         // TODO Check the database
-        if(credentials.getUserId().equals("carlos") && credentials.getPassword().equals("carlos")) {
+        if(credentials.isAuthenticatedByProvider()) {
             setStatus(AuthenticationStatus.SUCCESS);
             setAccount(new User("carlos"));
         }
         else {
             setStatus(AuthenticationStatus.FAILURE);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Authentication Failed"));
         }
     }
 }

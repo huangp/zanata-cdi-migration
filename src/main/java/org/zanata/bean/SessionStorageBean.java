@@ -20,7 +20,7 @@
  */
 package org.zanata.bean;
 
-import com.google.api.client.util.Maps;
+import com.google.common.collect.Maps;
 
 import javax.enterprise.context.SessionScoped;
 import java.io.Serializable;
