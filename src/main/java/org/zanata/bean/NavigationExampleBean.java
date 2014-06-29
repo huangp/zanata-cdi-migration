@@ -18,14 +18,24 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.security.authenticator;
+package org.zanata.bean;
+
+import javax.inject.Named;
 
 /**
- * This is an authenticator that will authenticate a user without any password
- * checks. It's meant to be used when an asynchronous task needs to run as if
- * started by aun authenticated user.
- *
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-public class RunAsAuthenticator {
+@Named
+public class NavigationExampleBean {
+
+    public String explicitlyNavigateToPage2() {
+        // Do something ...
+        return "";
+    }
+
+    public String explicitlyNavigateToPage1() {
+        // Do something ...
+        return "";
+    }
+
 }
