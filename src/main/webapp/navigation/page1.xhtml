@@ -20,6 +20,11 @@
   <title>Simple JSF Facelets page</title>
 </h:head>
 
+<f:metadata>
+  <f:viewParam name="myParam" value="#{navigationExampleBean.parameter}"/>
+  <f:event type="preRenderView" listener="#{navigationExampleBean.printParameter}"/>
+</f:metadata>
+
 <h:body>
   <h:form>
     This is page 1

@@ -20,13 +20,21 @@
  */
 package org.zanata.bean;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @Named
+@RequestScoped
 public class NavigationExampleBean {
+
+    @Getter @Setter
+    private String parameter;
 
     public String explicitlyNavigateToPage2() {
         // Do something ...
@@ -36,6 +44,10 @@ public class NavigationExampleBean {
     public String explicitlyNavigateToPage1() {
         // Do something ...
         return "";
+    }
+
+    public void printParameter() {
+        System.out.println("Parameter: " + parameter);
     }
 
 }
