@@ -20,33 +20,16 @@
  */
 package org.zanata.security;
 
-import org.apache.deltaspike.security.api.authorization.AbstractAccessDecisionVoter;
-import org.apache.deltaspike.security.api.authorization.AccessDecisionVoterContext;
-import org.apache.deltaspike.security.api.authorization.SecurityViolation;
-
-import javax.enterprise.context.RequestScoped;
-import java.util.Set;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
+ * Marks a method parameter as a permission target in a permission check.
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@RequestScoped
-public class RoleAccessDecisionVoter extends AbstractAccessDecisionVoter {
-    @Override
-    protected void checkPermission(
-            AccessDecisionVoterContext accessDecisionVoterContext,
-            Set<SecurityViolation> violations) {
-        
-        HasRole hasRole =
-                accessDecisionVoterContext.getMetaDataFor(HasRole.class.getName(), HasRole.class);
-        if( hasRole != null ) {
-            String role = hasRole.value();
-
-            // TODO Do an actual role check
-            if (!role.contains("admin")) {
-                violations.add(newSecurityViolation(
-                        "You don't have the necessary access"));
-            }
-        }
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+public @interface PermissionTarget {
 }

@@ -20,33 +20,24 @@
  */
 package org.zanata.security;
 
-import org.apache.deltaspike.security.api.authorization.AbstractAccessDecisionVoter;
-import org.apache.deltaspike.security.api.authorization.AccessDecisionVoterContext;
-import org.apache.deltaspike.security.api.authorization.SecurityViolation;
+import java.io.Serializable;
 
-import javax.enterprise.context.RequestScoped;
-import java.util.Set;
+import javax.enterprise.context.SessionScoped;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import lombok.Delegate;
+
+import org.picketlink.Identity;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@RequestScoped
-public class RoleAccessDecisionVoter extends AbstractAccessDecisionVoter {
-    @Override
-    protected void checkPermission(
-            AccessDecisionVoterContext accessDecisionVoterContext,
-            Set<SecurityViolation> violations) {
-        
-        HasRole hasRole =
-                accessDecisionVoterContext.getMetaDataFor(HasRole.class.getName(), HasRole.class);
-        if( hasRole != null ) {
-            String role = hasRole.value();
+@SessionScoped
+@Named("extendedIdentity")
+public class ExtendedIdentity implements Serializable {
 
-            // TODO Do an actual role check
-            if (!role.contains("admin")) {
-                violations.add(newSecurityViolation(
-                        "You don't have the necessary access"));
-            }
-        }
-    }
+    @Inject
+    @Delegate
+    private Identity identity;
 }

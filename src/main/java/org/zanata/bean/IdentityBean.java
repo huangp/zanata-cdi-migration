@@ -18,35 +18,23 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.security;
+package org.zanata.bean;
 
-import org.apache.deltaspike.security.api.authorization.AbstractAccessDecisionVoter;
-import org.apache.deltaspike.security.api.authorization.AccessDecisionVoterContext;
-import org.apache.deltaspike.security.api.authorization.SecurityViolation;
+import org.zanata.security.ExtendedIdentity;
 
-import javax.enterprise.context.RequestScoped;
-import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
+ * To try Identity stuff out.
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@RequestScoped
-public class RoleAccessDecisionVoter extends AbstractAccessDecisionVoter {
-    @Override
-    protected void checkPermission(
-            AccessDecisionVoterContext accessDecisionVoterContext,
-            Set<SecurityViolation> violations) {
-        
-        HasRole hasRole =
-                accessDecisionVoterContext.getMetaDataFor(HasRole.class.getName(), HasRole.class);
-        if( hasRole != null ) {
-            String role = hasRole.value();
+@Named
+public class IdentityBean {
+    @Inject
+    private ExtendedIdentity identity;
 
-            // TODO Do an actual role check
-            if (!role.contains("admin")) {
-                violations.add(newSecurityViolation(
-                        "You don't have the necessary access"));
-            }
-        }
+    public boolean isLoggedIn() {
+        return identity.isLoggedIn();
     }
 }

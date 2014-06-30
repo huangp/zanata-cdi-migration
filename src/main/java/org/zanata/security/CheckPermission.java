@@ -20,33 +20,25 @@
  */
 package org.zanata.security;
 
-import org.apache.deltaspike.security.api.authorization.AbstractAccessDecisionVoter;
-import org.apache.deltaspike.security.api.authorization.AccessDecisionVoterContext;
-import org.apache.deltaspike.security.api.authorization.SecurityViolation;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.enterprise.context.RequestScoped;
-import java.util.Set;
+import javax.enterprise.inject.Stereotype;
+
+import org.apache.deltaspike.security.api.authorization.Secured;
 
 /**
+ * Annotates methods and checks for the given permissions.
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@RequestScoped
-public class RoleAccessDecisionVoter extends AbstractAccessDecisionVoter {
-    @Override
-    protected void checkPermission(
-            AccessDecisionVoterContext accessDecisionVoterContext,
-            Set<SecurityViolation> violations) {
-        
-        HasRole hasRole =
-                accessDecisionVoterContext.getMetaDataFor(HasRole.class.getName(), HasRole.class);
-        if( hasRole != null ) {
-            String role = hasRole.value();
-
-            // TODO Do an actual role check
-            if (!role.contains("admin")) {
-                violations.add(newSecurityViolation(
-                        "You don't have the necessary access"));
-            }
-        }
-    }
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE, ElementType.METHOD})
+@Documented
+@Stereotype
+@Secured(PermissionCheckDecisionVoter.class)
+public @interface CheckPermission {
+    String permission();
 }
