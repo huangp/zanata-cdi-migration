@@ -7,29 +7,22 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <properties>
-    <deltaspike.version>1.0.0</deltaspike.version>
-    <version.picketlink.javaee.bom>2.6.0.Final</version.picketlink.javaee.bom>
+    <deltaspike.version>1.2.1</deltaspike.version>
+    <version.picketlink.javaee.bom>2.5.3.SP12</version.picketlink.javaee.bom>
     <infinispan.version>6.0.2.Final</infinispan.version>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.jboss.spec</groupId>
-        <artifactId>jboss-javaee-6.0</artifactId>
-        <version>3.0.2.Final</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.richfaces</groupId>
-        <artifactId>richfaces-bom</artifactId>
-        <version>4.3.2.Final</version>
+        <groupId>org.jboss.bom.eap</groupId>
+        <artifactId>jboss-javaee-6.0-with-tools</artifactId>
+        <version>6.2.0-redhat-1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.picketlink</groupId>
-        <artifactId>picketlink-javaee-6.0</artifactId>
+        <artifactId>picketlink-javaee-6.0-with-deltaspike</artifactId>
         <version>${version.picketlink.javaee.bom}</version>
         <type>pom</type>
         <scope>import</scope>
@@ -76,14 +69,9 @@
       <version>2.0.3</version>
     </dependency>
     <dependency>
-      <groupId>org.richfaces.ui</groupId>
-      <artifactId>richfaces-components-ui</artifactId>
-      <version>4.3.2.Final</version>
-    </dependency>
-    <dependency>
-      <groupId>org.richfaces.core</groupId>
-      <artifactId>richfaces-core-impl</artifactId>
-      <version>4.3.2.Final</version>
+      <groupId>org.richfaces</groupId>
+      <artifactId>richfaces</artifactId>
+      <version>4.5.0.Final</version>
     </dependency>
     <dependency>
       <groupId>javax.enterprise</groupId>
@@ -100,11 +88,11 @@
       <artifactId>jboss-jsf-api_2.1_spec</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>javax.el</groupId>
-      <artifactId>el-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>javax.el</groupId>-->
+      <!--<artifactId>el-api</artifactId>-->
+      <!--<scope>provided</scope>-->
+    <!--</dependency>-->
     <dependency>
       <groupId>org.apache.deltaspike.core</groupId>
       <artifactId>deltaspike-core-api</artifactId>
@@ -194,7 +182,7 @@
     <dependency>
       <groupId>org.jglue.cdi-unit</groupId>
       <artifactId>cdi-unit</artifactId>
-      <version>3.0.1</version>
+      <version>3.1.2</version>
       <exclusions>
         <exclusion>
           <groupId>org.jboss.weld.se</groupId>
@@ -253,6 +241,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
+      <version>18.0</version>
     </dependency>
   </dependencies>
   <repositories>

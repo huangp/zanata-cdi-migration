@@ -30,6 +30,7 @@ import org.jglue.cdiunit.AdditionalClasses;
 import org.jglue.cdiunit.CdiRunner;
 import org.jglue.cdiunit.InRequestScope;
 import org.jglue.cdiunit.InSessionScope;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.zanata.async.AsyncMethodInterceptor;
@@ -44,6 +45,7 @@ import org.zanata.bean.SessionStorageBean;
 @RunWith(CdiRunner.class)
 @AdditionalClasses({AsyncMethodInterceptor.class, BeanManagerProvider.class,
         WeldContextControl.class})
+@Ignore("cdi-unit race condition in ContextController")
 public class AsyncMethodsBeanTest {
 
     @Inject
@@ -63,7 +65,8 @@ public class AsyncMethodsBeanTest {
     }
 
     @Test
-    @InRequestScope // @InSessionScope doesn't seem to initialize the scope
+    @InRequestScope
+//    @InSessionScope //doesn't seem to initialize the scope
     public void testSessionIsShared() throws Exception {
         String str = "Stored String";
         storageBean.put("VALUE", str);
