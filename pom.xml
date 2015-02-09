@@ -8,22 +8,15 @@
   <packaging>war</packaging>
   <properties>
     <deltaspike.version>1.2.1</deltaspike.version>
-    <version.picketlink.javaee.bom>2.5.3.SP12</version.picketlink.javaee.bom>
+    <picketlink.version>2.5.3.SP12</picketlink.version>
     <infinispan.version>6.0.2.Final</infinispan.version>
   </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.jboss.bom.eap</groupId>
-        <artifactId>jboss-javaee-6.0-with-tools</artifactId>
-        <version>6.2.0-redhat-1</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.picketlink</groupId>
-        <artifactId>picketlink-javaee-6.0-with-deltaspike</artifactId>
-        <version>${version.picketlink.javaee.bom}</version>
+        <artifactId>jboss-javaee-6.0-with-hibernate</artifactId>
+        <version>6.4.0.Beta1</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -38,10 +31,12 @@
     <dependency>
       <groupId>org.picketlink</groupId>
       <artifactId>picketlink-api</artifactId>
+      <version>${picketlink.version}</version>
     </dependency>
     <dependency>
       <groupId>org.picketlink</groupId>
       <artifactId>picketlink-impl</artifactId>
+      <version>${picketlink.version}</version>
     </dependency>
     <!--<dependency>-->
       <!--<groupId>org.picketlink</groupId>-->
@@ -50,7 +45,7 @@
     <!--<dependency>-->
       <!--<groupId>org.picketlink</groupId>-->
       <!--<artifactId>picketlink-social</artifactId>-->
-      <!--<version>${version.picketlink.javaee.bom}</version>-->
+      <!--<version>${picketlink.version}</version>-->
     <!--</dependency>-->
     <!--<dependency>-->
       <!--<groupId>org.picketlink</groupId>-->
@@ -248,6 +243,20 @@
     <repository>
       <id>JBOSS_NEXUS</id>
       <url>http://repository.jboss.org/nexus/content/groups/public</url>
+    </repository>
+    <repository>
+      <id>redhat-earlyaccess-all-repository</id>
+      <name>Red Hat Early Access repository (all)</name>
+      <url>http://maven.repository.redhat.com/earlyaccess/all/</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
     </repository>
   </repositories>
   <build>
