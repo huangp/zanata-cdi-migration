@@ -88,6 +88,9 @@
       <!--<artifactId>el-api</artifactId>-->
       <!--<scope>provided</scope>-->
     <!--</dependency>-->
+    <!-- See https://issues.jboss.org/browse/WFK2-674
+     For some warnings in the console. It happens when deltaspike-jsf
+     doesn't run against jsf 2.1 (eap) -->
     <dependency>
       <groupId>org.apache.deltaspike.core</groupId>
       <artifactId>deltaspike-core-api</artifactId>
@@ -229,9 +232,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.seam.faces</groupId>
-      <artifactId>seam-faces</artifactId>
-      <version>3.2.0.Final</version>
+      <groupId>com.sun.faces</groupId>
+      <artifactId>jsf-impl</artifactId>
+      <version>2.1.20-05</version>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>

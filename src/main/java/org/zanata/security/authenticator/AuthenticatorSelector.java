@@ -52,13 +52,21 @@ public class AuthenticatorSelector {
 
     @Produces
     @PicketLink
+    @RequestScoped
     public Authenticator getAuthenticator() {
+        // TODO Could use UsernamePasswordCredentials
         if( credentials instanceof DefaultLoginCredentials) {
             return internalAuthenticator.get();
         }
         else if( credentials instanceof OpenIdCredentials) {
-            return openIdAuthenticator.get();
+            JAASAuthenticator authenticator = new JAASAuthenticator(
+                    "zanata.openid");
+            authenticator.setCredentials(credentials);
+            return authenticator;
         }
-        return null;
+        else {
+            throw new RuntimeException("Unknown credentials type "
+                    + credentials.getClass().getName());
+        }
     }
 }

@@ -11,7 +11,7 @@
     <dependencies>
       <!--<module name="org.picketlink" />-->
       <!--<module name="javax.el.api" />-->
-      <!--<module name="javax.faces.api" />-->
+      <module name="javax.faces.api" />
       <!--<module name="javax.jms.api" />-->
       <!--<module name="javax.mail.api" />-->
       <!--<module name="javax.servlet.api" />-->

@@ -23,10 +23,14 @@ package org.zanata.security.authenticator;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
 
 import org.picketlink.authentication.BaseAuthenticator;
 import org.picketlink.credential.DefaultLoginCredentials;
+import org.picketlink.idm.PartitionManager;
 import org.picketlink.idm.model.basic.User;
+import org.zanata.model.HAccount;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
@@ -36,13 +40,24 @@ public class InternalAuthenticator extends BaseAuthenticator {
     @Inject
     private DefaultLoginCredentials credentials;
 
+    @Inject
+    private EntityManager entityManager;
+
     @Override
     public void authenticate() {
 
-        // TODO Check the database
-        if(credentials.getUserId().equals("carlos") && credentials.getPassword().equals("carlos")) {
+        // TODO Use picketlink's IDM features. For now, just a simple authentication will do
+        HAccount account =
+                (HAccount) entityManager
+                        .createQuery(
+                                "from HAccount a where a.username = :username")
+                        .setParameter("username", credentials.getUserId())
+                        .getSingleResult();
+
+        // TODO Actually check a password
+        if(account != null) {
             setStatus(AuthenticationStatus.SUCCESS);
-            setAccount(new User("carlos"));
+            setAccount(new User(account.getUsername()));
         }
         else {
             setStatus(AuthenticationStatus.FAILURE);
