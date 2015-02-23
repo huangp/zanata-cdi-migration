@@ -18,34 +18,28 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.security.openid;
+package org.zanata.security.authentication;
 
+import javax.enterprise.context.RequestScoped;
+import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import org.picketlink.annotations.PicketLink;
+import org.picketlink.authentication.Authenticator;
+import org.picketlink.credential.DefaultLoginCredentials;
+import org.picketlink.idm.credential.Credentials;
+import org.zanata.security.credentials.OpenIdCredentials;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@WebServlet(urlPatterns = "/openid/auth")
-public class OpenIdConsumerServlet extends HttpServlet {
+@RequestScoped
+public class AuthenticatorSelector {
 
-    @Inject
-    private OpenIdAuthenticationManager openIdAuthManager;
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        try {
-            openIdAuthManager.initiateAuthentication(
-                    req.getParameter("openid"), req, resp);
-        }
-        catch (Exception e) {
-            throw new ServletException(e);
-        }
-    }
+    @Getter @Setter
+    private Credentials credentials;
 }

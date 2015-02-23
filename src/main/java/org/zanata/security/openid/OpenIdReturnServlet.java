@@ -41,7 +41,7 @@ public class OpenIdReturnServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         try {
-            openIdAuthManager.verifyResponse(req, resp);
+            openIdAuthManager.verifyResponse();
             resp.sendRedirect(req.getContextPath() + "/security/signin.xhtml");
         }
         catch (Exception e) {

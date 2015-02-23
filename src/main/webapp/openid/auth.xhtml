@@ -21,10 +21,10 @@
 </h:head>
 
 <h:body>
-  <form action="#{request.contextPath}/openid/auth" method="post">
-    <input type="text" name="openid"></input>
-    <input type="submit" value="Authenticate"/>
-  </form>
+  <h:form>
+    <h:inputText value="#{authenticationBean.openIdCredentials.openId}"/>
+    <h:commandButton action="#{authenticationBean.authenticateOpenId}" value="Log In"/>
+  </h:form>
 </h:body>
 
 </html>

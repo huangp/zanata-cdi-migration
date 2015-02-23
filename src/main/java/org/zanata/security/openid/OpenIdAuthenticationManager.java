@@ -31,6 +31,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.deltaspike.core.api.common.DeltaSpike;
 import org.openid4java.OpenIDException;
 import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.consumer.VerificationResult;
@@ -43,7 +44,7 @@ import org.openid4java.message.ax.AxMessage;
 import org.openid4java.message.ax.FetchRequest;
 import org.openid4java.message.ax.FetchResponse;
 import org.picketlink.Identity;
-import org.zanata.security.authenticator.AuthenticatorSelector;
+import org.zanata.security.authentication.AuthenticatorSelector;
 import org.zanata.security.credentials.OpenIdCredentials;
 
 /**
@@ -65,13 +66,18 @@ public class OpenIdAuthenticationManager implements Serializable {
     @Inject
     private transient AuthenticatorSelector authenticatorSelector;
 
+    @Inject @DeltaSpike
+    private transient HttpServletRequest request;
+
+    @Inject @DeltaSpike
+    private transient HttpServletResponse response;
+
     @PostConstruct
     private void initialize() {
         manager = new ConsumerManager();
     }
 
-    public void initiateAuthentication(String openId,
-            HttpServletRequest request, HttpServletResponse response)
+    public void initiateAuthentication()
             throws Exception {
         try
         {
@@ -87,7 +93,7 @@ public class OpenIdAuthenticationManager implements Serializable {
             // HttpClientFactory.setProxyProperties(proxyProps);
 
             // perform discovery on the user-supplied identifier
-            List discoveries = manager.discover(openId);
+            List discoveries = manager.discover(credentials.getOpenId());
 
             // attempt to associate with the OpenID provider
             // and retrieve one service endpoint for authentication
@@ -130,15 +136,13 @@ public class OpenIdAuthenticationManager implements Serializable {
                         authReq.getDestinationUrl(false));
                 dispatcher.forward(request, response);
             }
-        } catch (OpenIDException e)
-        {
-            // present error to the user
+        } catch (OpenIDException e) {
+            throw new RuntimeException(e);
         }
     }
 
     // TODO handle exceptions properly
-    public void verifyResponse(HttpServletRequest request,
-            HttpServletResponse httpResponse) throws Exception {
+    public void verifyResponse() throws Exception {
         try
         {
             // extract the parameters from the authentication response

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Red Hat, Inc. and individual contributors as indicated by the
+ * Copyright 2015, Red Hat, Inc. and individual contributors as indicated by the
  * @author tags. See the copyright.txt file in the distribution for a full
  * listing of individual contributors.
  *
@@ -18,31 +18,47 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.security.authenticator;
-
-import org.picketlink.authentication.BaseAuthenticator;
-import org.picketlink.idm.model.basic.User;
-import org.zanata.security.credentials.OpenIdCredentials;
+package org.zanata.security.jaas;
 
 import javax.inject.Inject;
+import javax.security.auth.login.LoginException;
+
+import org.openid4java.consumer.ConsumerManager;
+import org.zanata.security.openid.OpenIdAuthenticationManager;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-public class OpenIdAuthenticator extends BaseAuthenticator {
+public class OpenIdLoginModule extends ZanataLoginModule {
+    private ConsumerManager manager;
 
     @Inject
-    private OpenIdCredentials credentials;
+    private OpenIdAuthenticationManager openIdAuthenticationManager;
 
     @Override
-    public void authenticate() {
-        // TODO Check the database
-        if(credentials.isAuthenticatedByProvider()) {
-            setStatus(AuthenticationStatus.SUCCESS);
-            setAccount(new User("carlos"));
+    public boolean login() throws LoginException {
+        try {
+            // This verifies the response and does the login
+            openIdAuthenticationManager.verifyResponse();
         }
-        else {
-            setStatus(AuthenticationStatus.FAILURE);
+        catch (Exception e) {
+            throw new LoginException(e.getMessage());
         }
+        return true;
+    }
+
+    @Override
+    public boolean commit() throws LoginException {
+        return true;
+    }
+
+    @Override
+    public boolean abort() throws LoginException {
+        return true;
+    }
+
+    @Override
+    public boolean logout() throws LoginException {
+        return true;
     }
 }

@@ -21,6 +21,9 @@
 package org.zanata.bean;
 
 import static org.picketlink.Identity.AuthenticationResult;
+import static org.picketlink.Identity.AuthenticationResult.FAILED;
+import static org.picketlink.Identity.AuthenticationResult.SUCCESS;
+import static org.picketlink.idm.credential.Credentials.Status.IN_PROGRESS;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -30,7 +33,10 @@ import lombok.Getter;
 
 import org.picketlink.Identity;
 import org.picketlink.credential.DefaultLoginCredentials;
-import org.zanata.security.authenticator.AuthenticatorSelector;
+import org.picketlink.idm.credential.Credentials;
+import org.zanata.security.authentication.AuthenticatorSelector;
+import org.zanata.security.credentials.OpenIdCredentials;
+import org.zanata.security.openid.OpenIdAuthenticationManager;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
@@ -44,15 +50,42 @@ public class AuthenticationBean {
     private DefaultLoginCredentials loginCredentials;
 
     @Inject
+    @Getter
+    private OpenIdCredentials openIdCredentials;
+
+    @Inject
     private AuthenticatorSelector authenticatorSelector;
+
+    @Inject
+    private OpenIdAuthenticationManager openIdAuthenticationManager;
     
     @Inject
     private Identity identity;
 
     public void authenticateInternal() {
         authenticatorSelector.setCredentials(loginCredentials);
+        authenticate();
+    }
+
+    public void authenticateOpenId() {
+        authenticatorSelector.setCredentials(openIdCredentials);
+        try {
+            openIdAuthenticationManager.initiateAuthentication();
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void authenticate() {
         AuthenticationResult result = identity.login();
-        if( result.equals( AuthenticationResult.SUCCESS )) {
+        // Open Id authentication won't finish here
+        if (result.equals(FAILED)
+                && authenticatorSelector.getCredentials() instanceof OpenIdCredentials
+                && authenticatorSelector.getCredentials().getStatus() == IN_PROGRESS) {
+            // Just let it continue its course
+        }
+        else if( result.equals(SUCCESS) ) {
             // Put a faces message on screen
         }
         else {

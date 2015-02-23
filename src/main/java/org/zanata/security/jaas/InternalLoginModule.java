@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Red Hat, Inc. and individual contributors as indicated by the
+ * Copyright 2015, Red Hat, Inc. and individual contributors as indicated by the
  * @author tags. See the copyright.txt file in the distribution for a full
  * listing of individual contributors.
  *
@@ -18,24 +18,25 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.security.authenticator;
+package org.zanata.security.jaas;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
+import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.login.LoginException;
+import javax.security.auth.spi.LoginModule;
 
-import org.picketlink.authentication.BaseAuthenticator;
+import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.picketlink.credential.DefaultLoginCredentials;
-import org.picketlink.idm.PartitionManager;
-import org.picketlink.idm.model.basic.User;
 import org.zanata.model.HAccount;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-public class InternalAuthenticator extends BaseAuthenticator {
+public class InternalLoginModule extends ZanataLoginModule {
 
     @Inject
     private DefaultLoginCredentials credentials;
@@ -44,8 +45,7 @@ public class InternalAuthenticator extends BaseAuthenticator {
     private EntityManager entityManager;
 
     @Override
-    public void authenticate() {
-
+    public boolean login() throws LoginException {
         // TODO Use picketlink's IDM features. For now, just a simple authentication will do
         HAccount account =
                 (HAccount) entityManager
@@ -56,12 +56,25 @@ public class InternalAuthenticator extends BaseAuthenticator {
 
         // TODO Actually check a password
         if(account != null) {
-            setStatus(AuthenticationStatus.SUCCESS);
-            setAccount(new User(account.getUsername()));
+            return true;
         }
         else {
-            setStatus(AuthenticationStatus.FAILURE);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Authentication Failed"));
+            throw new LoginException();
         }
+    }
+
+    @Override
+    public boolean commit() throws LoginException {
+        return true;
+    }
+
+    @Override
+    public boolean abort() throws LoginException {
+        return true;
+    }
+
+    @Override
+    public boolean logout() throws LoginException {
+        return true;
     }
 }
