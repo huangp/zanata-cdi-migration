@@ -27,10 +27,13 @@ import javax.inject.Inject;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
+import lombok.extern.slf4j.Slf4j;
 import org.picketlink.annotations.PicketLink;
 import org.picketlink.authentication.BaseAuthenticator;
 import org.picketlink.credential.DefaultLoginCredentials;
@@ -39,6 +42,9 @@ import org.picketlink.idm.model.basic.User;
 import org.zanata.security.credentials.OpenIdCredentials;
 
 import static org.picketlink.idm.credential.Credentials.Status.IN_PROGRESS;
+import static org.zanata.security.authentication.AuthType.INTERNAL;
+import static org.zanata.security.authentication.AuthType.KERBEROS;
+import static org.zanata.security.authentication.AuthType.OPENID;
 
 /**
  * Initiates an authentication request in accordance with the type of
@@ -47,8 +53,7 @@ import static org.picketlink.idm.credential.Credentials.Status.IN_PROGRESS;
  * @author Carlos Munoz <a
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@PicketLink
-@RequestScoped
+@Slf4j
 public class JAASAuthenticator extends BaseAuthenticator {
 
     @Inject
@@ -60,30 +65,25 @@ public class JAASAuthenticator extends BaseAuthenticator {
             Subject subject = new Subject();
             LoginContext delegate =
                     new LoginContext(getLoginModuleName(), subject,
-                            new CallbackHandler() {
-                                @Override
-                                public void handle(Callback[] callbacks)
-                                        throws IOException,
-                                        UnsupportedCallbackException {
-                                    System.out
-                                            .println(
-                                                    "======Lets see what this does");
-                                }
-                            });
+                            getCallbackHandler());
             delegate.login();
             setStatus(AuthenticationStatus.SUCCESS);
             setAccount(new User("undefined"));
         } catch (LoginException e) {
+            log.error("Exception authenticating with JAAS", e);
             setStatus(AuthenticationStatus.FAILURE);
         }
     }
 
     private String getLoginModuleName() {
-        if (authenticatorSelector.getCredentials() instanceof DefaultLoginCredentials) {
+        if (authenticatorSelector.getAuthenticationType() == INTERNAL) {
             return "zanata.cdi.internal";
         }
-        else if(authenticatorSelector.getCredentials() instanceof OpenIdCredentials) {
+        else if(authenticatorSelector.getAuthenticationType() == OPENID) {
             return "zanata.cdi.openid";
+        }
+        else if(authenticatorSelector.getAuthenticationType() == KERBEROS) {
+            return "zanata.kerberos";
         }
         return null;
     }
@@ -100,5 +100,38 @@ public class JAASAuthenticator extends BaseAuthenticator {
                             .getOpenId());
         }
         return null;
+    }
+
+    private CallbackHandler getCallbackHandler() {
+        final DefaultLoginCredentials credentials =
+                (DefaultLoginCredentials) authenticatorSelector.getCredentials();
+        if(authenticatorSelector.getAuthenticationType() == KERBEROS) {
+            return new CallbackHandler() {
+                @Override
+                public void handle(Callback[] callbacks)
+                        throws IOException, UnsupportedCallbackException {
+                    for (int i = 0; i < callbacks.length; i++) {
+                        if (callbacks[i] instanceof NameCallback) {
+                            ((NameCallback) callbacks[i]).setName(credentials.getUserId());
+                        } else if (callbacks[i] instanceof PasswordCallback) {
+                            ((PasswordCallback) callbacks[i])
+                                    .setPassword(credentials.getPassword() != null ? credentials.getPassword()
+                                            .toCharArray() : null);
+                        } else {
+                            log.warn("Unsupported callback " + callbacks[i]);
+                        }
+                    }
+                }
+            };
+        }
+        else {
+            return new CallbackHandler() {
+                @Override
+                public void handle(Callback[] callbacks)
+                        throws IOException, UnsupportedCallbackException {
+                    // does nothing
+                }
+            };
+        }
     }
 }

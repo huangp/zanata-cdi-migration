@@ -42,4 +42,24 @@ public class AuthenticatorSelector {
 
     @Getter @Setter
     private Credentials credentials;
+
+    @Getter @Setter
+    private AuthType authenticationType;
+
+    @Inject
+    private Instance<JAASAuthenticator> jaasAuthenticator;
+
+    // TODO See if this is possible
+    //private Instance<OpenIdAuthenticator> openIdAuthenticator;
+
+    @Produces
+    @PicketLink
+    @RequestScoped
+    public Authenticator getAuthenticator() {
+        switch (authenticationType) {
+            // Kerberos authentication happens with JAAS
+            default:
+                return jaasAuthenticator.get();
+        }
+    }
 }

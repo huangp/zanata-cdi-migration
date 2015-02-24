@@ -6,6 +6,14 @@
   xmlns:f="http://java.sun.com/jsf/core"
   xmlns:h="http://java.sun.com/jsf/html">
 <f:view>
-  <h:outputLabel value="This is a kerberos login page"/>
+  <!--TODO This could reuse the same login page (like in Zanata)-->
+  Please, enter your KERBEROS credentials:<br/><br/>
+  <h:form>
+    Username: <h:inputText value="#{loginCredentials.userId}"
+    required="true"/><br/>
+    Password: <h:inputSecret value="#{loginCredentials.password}"
+    required="true"/><br/>
+    <h:commandButton value="Finish" action="#{authenticationBean.authenticateKerberosWithForm}"/>
+  </h:form>
 </f:view>
 </html>
