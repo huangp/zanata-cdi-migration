@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Red Hat, Inc. and individual contributors as indicated by the
+ * Copyright 2015, Red Hat, Inc. and individual contributors as indicated by the
  * @author tags. See the copyright.txt file in the distribution for a full
  * listing of individual contributors.
  *
@@ -18,37 +18,23 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.test.cdi;
+package org.zanata.rest;
 
-import org.jglue.cdiunit.CdiRunner;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.zanata.test.CdiContainerTest;
-import org.zanata.test.bean.CoffeeBean;
-import org.zanata.test.bean.TreeBean;
+import com.google.common.collect.Sets;
 
-import javax.inject.Inject;
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
+import java.util.Set;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
- * TODO Seems to have stopped working since the introduction of CdiUnit
  */
-@RunWith(CdiRunner.class)
-public class BasicCdiTest /*extends CdiContainerTest*/ {
-
-    @Inject
-    private CoffeeBean injectedBean;
-
-    @Inject
-    private TreeBean treeBean;
-
-    @Test
-    public void basicInjectionOnTestClass() throws Exception {
-        assert injectedBean.getName().equals(CoffeeBean.class.getName());
-    }
-
-    @Test
-    public void multiLevelInjection() throws Exception {
-        assert treeBean.getCoffeeBean().getName().equals(CoffeeBean.class.getName());
+@ApplicationPath("/rest")
+public class RestApplication extends Application {
+    @Override
+    public Set<Class<?>> getClasses() {
+        Set<Class<?>> resourceClasses = Sets.newHashSet();
+        resourceClasses.add(GenericRestResource.class);
+        return resourceClasses;
     }
 }

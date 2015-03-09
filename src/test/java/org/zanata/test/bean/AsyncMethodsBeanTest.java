@@ -45,7 +45,7 @@ import org.zanata.bean.SessionStorageBean;
 @RunWith(CdiRunner.class)
 @AdditionalClasses({AsyncMethodInterceptor.class, BeanManagerProvider.class,
         WeldContextControl.class})
-@Ignore("cdi-unit race condition in ContextController")
+//@Ignore("cdi-unit race condition in ContextController")
 public class AsyncMethodsBeanTest {
 
     @Inject
