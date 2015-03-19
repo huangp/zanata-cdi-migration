@@ -32,6 +32,8 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.apache.deltaspike.cdise.api.ContextControl;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 
@@ -41,6 +43,7 @@ import com.google.common.util.concurrent.ListenableFuture;
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @ApplicationScoped
+@Slf4j
 public class AsynchronousTaskManager {
 
     private ExecutorService scheduler;
@@ -74,6 +77,10 @@ public class AsynchronousTaskManager {
                 }
                 catch(Throwable t) {
                     taskFuture.setException(t);
+                    // TODO log unimportant exceptions as WARN
+                    // but make sure this doesn't lead to unlogged 500 errors
+                    log.error(
+                            "Exception when executing an asynchronous task.", t);
                 }
                 finally {
                     // stop the started contexts to ensure that all scoped
