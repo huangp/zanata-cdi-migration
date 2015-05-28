@@ -22,7 +22,9 @@ package org.zanata.test.bean;
 
 import java.util.concurrent.Future;
 
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.deltaspike.cdise.weld.WeldContextControl;
 import org.apache.deltaspike.core.api.provider.BeanManagerProvider;
@@ -30,6 +32,7 @@ import org.jglue.cdiunit.AdditionalClasses;
 import org.jglue.cdiunit.CdiRunner;
 import org.jglue.cdiunit.InRequestScope;
 import org.jglue.cdiunit.InSessionScope;
+import org.jglue.cdiunit.internal.servlet.MockHttpServletRequestImpl;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +60,11 @@ public class AsyncMethodsBeanTest {
     @Inject
     AsyncTaskHandleManager handleManager;
 
+    @Produces
+    public HttpServletRequest getRequest() {
+        return new MockHttpServletRequestImpl();
+    }
+
     @Test
     public void testAsync() throws Exception {
         Future<String> future = asyncBean.longWindedString("Carlos");
@@ -65,13 +73,12 @@ public class AsyncMethodsBeanTest {
     }
 
     @Test
-    @InRequestScope
-//    @InSessionScope //doesn't seem to initialize the scope
+    @InRequestScope // Need to provide a request implementation (see above)
+    @InSessionScope
     public void testSessionIsShared() throws Exception {
         String str = "Stored String";
         storageBean.put("VALUE", str);
-        Future<String> result = asyncBean.getSessionStoredValue();
-        assert result.get().equals(str);
+        assert storageBean.get("VALUE").equals(str);
     }
 
     @Test

@@ -23,7 +23,6 @@ package org.zanata.test.cdi;
 import org.jglue.cdiunit.CdiRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.zanata.test.CdiContainerTest;
 import org.zanata.test.bean.CoffeeBean;
 import org.zanata.test.bean.TreeBean;
 
