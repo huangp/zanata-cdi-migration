@@ -34,6 +34,7 @@ public class RestApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         Set<Class<?>> resourceClasses = Sets.newHashSet();
+//        resourceClasses.add(GenericRestResource.class);
         return resourceClasses;
     }
 }

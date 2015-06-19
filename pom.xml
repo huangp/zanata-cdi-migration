@@ -7,7 +7,7 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <properties>
-    <deltaspike.version>1.2.1</deltaspike.version>
+    <deltaspike.version>1.4.1</deltaspike.version>
     <picketlink.version>2.5.3.SP12</picketlink.version>
     <infinispan.version>6.0.2.Final</infinispan.version>
   </properties>
@@ -16,13 +16,18 @@
       <dependency>
         <groupId>org.jboss.bom.eap</groupId>
         <artifactId>jboss-javaee-6.0-with-hibernate</artifactId>
-        <version>6.4.0.Beta1</version>
+        <version>6.4.1.GA</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
   <dependencies>
+    <dependency>
+      <groupId>org.apache.myfaces.extensions.cdi.bundles</groupId>
+      <artifactId>myfaces-extcdi-bundle-jsf20</artifactId>
+      <version>1.0.6</version>
+    </dependency>
     <dependency>
       <groupId>org.jboss.spec.javax.servlet</groupId>
       <artifactId>jboss-servlet-api_3.0_spec</artifactId>
@@ -282,6 +287,20 @@
     <repository>
       <id>JBOSS_NEXUS</id>
       <url>http://repository.jboss.org/nexus/content/groups/public</url>
+    </repository>
+    <repository>
+      <id>redhat-techpreview-all-repository</id>
+      <name>Red Hat Tech Preview repository (all)</name>
+      <url>https://maven.repository.redhat.com/techpreview/all/</url>
+      <layout>default</layout>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+        <updatePolicy>never</updatePolicy>
+      </snapshots>
     </repository>
     <repository>
       <id>redhat-earlyaccess-all-repository</id>

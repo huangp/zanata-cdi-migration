@@ -31,7 +31,6 @@ import org.apache.deltaspike.core.api.provider.BeanManagerProvider;
 import org.jglue.cdiunit.AdditionalClasses;
 import org.jglue.cdiunit.CdiRunner;
 import org.jglue.cdiunit.InRequestScope;
-import org.jglue.cdiunit.InSessionScope;
 import org.jglue.cdiunit.internal.servlet.MockHttpServletRequestImpl;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -72,9 +71,10 @@ public class AsyncMethodsBeanTest {
         assert future.get().length() > 0;
     }
 
+    @Ignore("sessions/requests are ThreadLocal")
     @Test
     @InRequestScope // Need to provide a request implementation (see above)
-    @InSessionScope
+//    @InSessionScope
     public void testSessionIsShared() throws Exception {
         String str = "Stored String";
         storageBean.put("VALUE", str);

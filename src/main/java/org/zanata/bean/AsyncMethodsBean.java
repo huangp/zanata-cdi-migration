@@ -42,7 +42,7 @@ public class AsyncMethodsBean {
 
     @Async
     public ListenableFuture<String> longWindedString(String name) {
-        for(int i =0; i<10; i++) {
+        for(int i =0; i<2; i++) {
             try {
                 Thread.sleep(1000);
             }
@@ -51,7 +51,7 @@ public class AsyncMethodsBean {
             }
             System.out.println("Sleeping... zzz");
         }
-        return new AsyncTaskResult<String>("Hello " + name + "! I slept for 10 seconds");
+        return new AsyncTaskResult<String>("Hello " + name + "! I slept for 2 seconds");
     }
 
     @Async
