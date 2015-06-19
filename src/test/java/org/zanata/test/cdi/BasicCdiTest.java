@@ -30,7 +30,6 @@ import javax.inject.Inject;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
- * TODO Seems to have stopped working since the introduction of CdiUnit
  */
 @RunWith(CdiRunner.class)
 public class BasicCdiTest /*extends CdiContainerTest*/ {
