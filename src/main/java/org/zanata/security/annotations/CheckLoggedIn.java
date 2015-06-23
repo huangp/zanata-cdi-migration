@@ -18,56 +18,22 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.bean;
+package org.zanata.security.annotations;
 
-import java.io.Serializable;
+import org.apache.deltaspike.security.api.authorization.SecurityBindingType;
 
-import javax.inject.Named;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
-
-import lombok.Getter;
-import lombok.Setter;
-
-import org.apache.deltaspike.core.api.scope.ViewAccessScoped;
-import org.zanata.security.HasRole;
-import org.zanata.security.LoggedIn;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@ViewAccessScoped
-@Named
-public class MyViewBean implements Serializable {
-
-    public void printName() {
-        System.out.println("View bean: " + this.toString());
-    }
-
-    @Getter
-    @Setter
-    @Size(min = 5, max = 10)
-    private String name;
-
-    @Getter
-    @Setter
-    @Min(5)
-    private int age;
-
-
-    @LoggedIn
-    public String getMessage() {
-        return "You are logged in";
-    }
-
-    @HasRole("admin")
-    public void doSomethingAuthorized() {
-        // Should fail if the right role is not contained
-    }
-
-    @HasRole("dodgyuser")
-    public void doSomethingUnauthorized() {
-        // Should fail if the right role is not contained
-    }
-
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Documented
+@SecurityBindingType
+public @interface CheckLoggedIn {
 }

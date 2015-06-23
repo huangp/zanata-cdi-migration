@@ -18,9 +18,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.security;
-
-import org.apache.deltaspike.security.api.authorization.SecurityBindingType;
+package org.zanata.security.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -28,12 +26,23 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import javax.enterprise.inject.Stereotype;
+
+import org.apache.deltaspike.security.api.authorization.Secured;
+import org.zanata.security.PermissionCheckDecisionVoter;
+
 /**
+ * Annotates methods and checks for the given permissions.
+ * The target of the permission check will be any method parameters annotated
+ * with {@link PermissionTarget}
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
+ * @see PermissionTarget
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Target({ ElementType.TYPE, ElementType.METHOD})
 @Documented
-@SecurityBindingType
-public @interface LoggedIn {
+@Stereotype
+@Secured(PermissionCheckDecisionVoter.class)
+public @interface CheckPermission {
+    String permission();
 }

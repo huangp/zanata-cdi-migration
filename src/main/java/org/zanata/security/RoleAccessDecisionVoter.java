@@ -23,6 +23,7 @@ package org.zanata.security;
 import org.apache.deltaspike.security.api.authorization.AbstractAccessDecisionVoter;
 import org.apache.deltaspike.security.api.authorization.AccessDecisionVoterContext;
 import org.apache.deltaspike.security.api.authorization.SecurityViolation;
+import org.zanata.security.annotations.CheckRole;
 
 import javax.enterprise.context.RequestScoped;
 import java.util.Set;
@@ -37,8 +38,8 @@ public class RoleAccessDecisionVoter extends AbstractAccessDecisionVoter {
             AccessDecisionVoterContext accessDecisionVoterContext,
             Set<SecurityViolation> violations) {
         
-        HasRole hasRole =
-                accessDecisionVoterContext.getMetaDataFor(HasRole.class.getName(), HasRole.class);
+        CheckRole hasRole =
+                accessDecisionVoterContext.getMetaDataFor(CheckRole.class.getName(), CheckRole.class);
         if( hasRole != null ) {
             String role = hasRole.value();
 

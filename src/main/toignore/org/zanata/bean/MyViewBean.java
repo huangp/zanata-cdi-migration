@@ -18,27 +18,56 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF
  * site: http://www.fsf.org.
  */
-package org.zanata.security;
+package org.zanata.bean;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.Serializable;
 
-import javax.enterprise.inject.Stereotype;
+import javax.inject.Named;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 
-import org.apache.deltaspike.security.api.authorization.Secured;
+import lombok.Getter;
+import lombok.Setter;
+
+import org.apache.deltaspike.core.api.scope.ViewAccessScoped;
+import org.zanata.security.annotations.CheckRole;
+import org.zanata.security.annotations.CheckLoggedIn;
 
 /**
- * Annotates methods and checks for the given permissions.
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD})
-@Documented
-@Stereotype
-@Secured(PermissionCheckDecisionVoter.class)
-public @interface CheckPermission {
-    String permission();
+@ViewAccessScoped
+@Named
+public class MyViewBean implements Serializable {
+
+    public void printName() {
+        System.out.println("View bean: " + this.toString());
+    }
+
+    @Getter
+    @Setter
+    @Size(min = 5, max = 10)
+    private String name;
+
+    @Getter
+    @Setter
+    @Min(5)
+    private int age;
+
+
+    @CheckLoggedIn
+    public String getMessage() {
+        return "You are logged in";
+    }
+
+    @CheckRole("admin")
+    public void doSomethingAuthorized() {
+        // Should fail if the right role is not contained
+    }
+
+    @CheckRole("dodgyuser")
+    public void doSomethingUnauthorized() {
+        // Should fail if the right role is not contained
+    }
+
 }

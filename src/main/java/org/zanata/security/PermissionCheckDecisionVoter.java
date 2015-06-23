@@ -33,6 +33,8 @@ import org.apache.deltaspike.security.api.authorization.AbstractAccessDecisionVo
 import org.apache.deltaspike.security.api.authorization.AccessDecisionVoterContext;
 import org.apache.deltaspike.security.api.authorization.SecurityViolation;
 import org.picketlink.Identity;
+import org.zanata.security.annotations.CheckPermission;
+import org.zanata.security.annotations.PermissionTarget;
 
 /**
  * @author Carlos Munoz <a

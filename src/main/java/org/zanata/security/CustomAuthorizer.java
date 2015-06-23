@@ -22,16 +22,9 @@ package org.zanata.security;
 
 import org.apache.deltaspike.security.api.authorization.Secures;
 import org.picketlink.Identity;
-import org.picketlink.idm.IdentityManager;
-import org.picketlink.idm.RelationshipManager;
-import org.picketlink.idm.model.basic.User;
-import org.zanata.ServiceLocator;
+import org.zanata.security.annotations.CheckLoggedIn;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.interceptor.InvocationContext;
-
-import static org.picketlink.idm.model.basic.BasicModel.getRole;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
@@ -41,7 +34,7 @@ import static org.picketlink.idm.model.basic.BasicModel.getRole;
 public class CustomAuthorizer {
 
     @Secures
-    @LoggedIn
+    @CheckLoggedIn
     public boolean isLoggedIn(Identity identity) throws Exception {
         return identity.isLoggedIn();
     }
