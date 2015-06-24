@@ -342,6 +342,24 @@
     <finalName>cdi-security</finalName>
     <plugins>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals><goal>add-source</goal></goals>
+            <configuration>
+              <sources>
+                <!-- Existing code brought in from Zanata -->
+                <source>src/main/movedover</source>
+                 <!--Code created for ad hoc testing -->
+                <source>src/main/toignore</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
         <configuration>
