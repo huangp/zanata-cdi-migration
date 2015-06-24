@@ -8,7 +8,7 @@
   <packaging>war</packaging>
   <properties>
     <deltaspike.version>1.4.1</deltaspike.version>
-    <picketlink.version>2.5.3.SP12</picketlink.version>
+    <picketlink.version>2.5.4.SP4</picketlink.version>
     <infinispan.version>6.0.2.Final</infinispan.version>
   </properties>
   <dependencyManagement>
@@ -44,9 +44,15 @@
       <version>${picketlink.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.picketlink</groupId>
+      <artifactId>picketlink-idm-api</artifactId>
+      <version>${picketlink.version}</version>
+    </dependency>
     <!--<dependency>-->
       <!--<groupId>org.picketlink</groupId>-->
       <!--<artifactId>picketlink-deltaspike</artifactId>-->
+      <!--<version>${picketlink.version}</version>-->
     <!--</dependency>-->
     <!--<dependency>-->
       <!--<groupId>org.picketlink</groupId>-->
