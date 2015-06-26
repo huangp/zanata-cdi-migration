@@ -55,7 +55,7 @@ public class CheckPermissionDecisionVoter extends
                 accessDecisionVoterContext.getMetaDataFor(
                         CheckPermission.class.getName(), CheckPermission.class);
         if (checkPermission != null) {
-            String permissionName = checkPermission.permission();
+            String permissionName = checkPermission.value();
             InvocationContext invocationCtx =
                     accessDecisionVoterContext.<InvocationContext> getSource();
             List permissionTargets = getPermissionTargets(invocationCtx);
