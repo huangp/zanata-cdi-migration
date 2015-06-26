@@ -21,7 +21,7 @@
 package org.zanata.security.annotations;
 
 import org.apache.deltaspike.security.api.authorization.Secured;
-import org.zanata.security.RoleAccessDecisionVoter;
+import org.zanata.security.CheckRoleDecisionVoter;
 
 import javax.enterprise.inject.Stereotype;
 import java.lang.annotation.Documented;
@@ -37,7 +37,7 @@ import java.lang.annotation.Target;
 @Target({ ElementType.TYPE, ElementType.METHOD})
 @Documented
 @Stereotype
-@Secured(RoleAccessDecisionVoter.class)
+@Secured(CheckRoleDecisionVoter.class)
 public @interface CheckRole {
     String value();
 }

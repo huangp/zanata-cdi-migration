@@ -28,10 +28,9 @@ import javax.enterprise.context.ApplicationScoped;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
- * TODO Figure out a better name
  */
 @ApplicationScoped
-public class CustomAuthorizer {
+public class CheckLoggedInProvider {
 
     @Secures
     @CheckLoggedIn

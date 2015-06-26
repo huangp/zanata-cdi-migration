@@ -38,12 +38,12 @@ import java.util.Set;
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @RequestScoped
-public class RoleAccessDecisionVoter extends AbstractAccessDecisionVoter {
+public class CheckRoleDecisionVoter extends AbstractAccessDecisionVoter {
     @Override
     protected void checkPermission(
             AccessDecisionVoterContext accessDecisionVoterContext,
             Set<SecurityViolation> violations) {
-        
+
         CheckRole hasRole =
                 accessDecisionVoterContext.getMetaDataFor(CheckRole.class.getName(), CheckRole.class);
         if (hasRole != null) {
@@ -61,7 +61,7 @@ public class RoleAccessDecisionVoter extends AbstractAccessDecisionVoter {
 
             String role = hasRole.value();
 
-            // FIXME Do an actual role check
+            // FIXME DANGER!! Do an actual role check
             if (!role.contains("admin")) {
                 violations.add(newSecurityViolation(
                         "You don't have the necessary access"));

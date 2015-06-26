@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
 import javax.enterprise.inject.Stereotype;
 
 import org.apache.deltaspike.security.api.authorization.Secured;
-import org.zanata.security.PermissionCheckDecisionVoter;
+import org.zanata.security.CheckPermissionDecisionVoter;
 
 /**
  * Annotates methods and checks for the given permissions.
@@ -42,7 +42,7 @@ import org.zanata.security.PermissionCheckDecisionVoter;
 @Target({ ElementType.TYPE, ElementType.METHOD})
 @Documented
 @Stereotype
-@Secured(PermissionCheckDecisionVoter.class)
+@Secured(CheckPermissionDecisionVoter.class)
 public @interface CheckPermission {
     String permission();
 }

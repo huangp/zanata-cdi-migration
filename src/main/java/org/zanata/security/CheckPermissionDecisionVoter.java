@@ -41,7 +41,7 @@ import org.zanata.security.annotations.PermissionTarget;
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @RequestScoped
-public class PermissionCheckDecisionVoter extends
+public class CheckPermissionDecisionVoter extends
         AbstractAccessDecisionVoter {
 
     @Inject
