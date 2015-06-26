@@ -23,6 +23,12 @@ package org.zanata.security;
 import org.apache.deltaspike.security.api.authorization.AbstractAccessDecisionVoter;
 import org.apache.deltaspike.security.api.authorization.AccessDecisionVoterContext;
 import org.apache.deltaspike.security.api.authorization.SecurityViolation;
+import org.jboss.security.SecurityContext;
+import org.jboss.security.SecurityContextAssociation;
+import org.jboss.security.identity.Role;
+import org.jboss.security.identity.RoleFactory;
+import org.jboss.security.identity.RoleGroup;
+import org.picketbox.util.PicketBoxUtil;
 import org.zanata.security.annotations.CheckRole;
 
 import javax.enterprise.context.RequestScoped;
@@ -40,10 +46,22 @@ public class RoleAccessDecisionVoter extends AbstractAccessDecisionVoter {
         
         CheckRole hasRole =
                 accessDecisionVoterContext.getMetaDataFor(CheckRole.class.getName(), CheckRole.class);
-        if( hasRole != null ) {
+        if (hasRole != null) {
+// TODO unify with PicketLink roles
+//            Role role = RoleFactory.createRole(hasRole.value());
+//
+//            SecurityContext sc = SecurityContextAssociation.getSecurityContext();
+//            RoleGroup roleGroup = PicketBoxUtil
+//                    .getRolesFromSubject(sc.getUtil().getSubject());
+//
+//            if (!roleGroup.containsRole(role)) {
+//                violations.add(newSecurityViolation(
+//                        "You don't have the necessary access"));
+//            }
+
             String role = hasRole.value();
 
-            // TODO Do an actual role check
+            // FIXME Do an actual role check
             if (!role.contains("admin")) {
                 violations.add(newSecurityViolation(
                         "You don't have the necessary access"));
