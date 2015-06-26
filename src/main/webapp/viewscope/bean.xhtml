@@ -14,6 +14,7 @@
   xmlns:ui="http://java.sun.com/jsf/facelets"
   xmlns:f="http://java.sun.com/jsf/core"
   xmlns:rich="http://richfaces.org/rich"
+  xmlns:ds="http://deltaspike.apache.org/jsf"
   xmlns:a4j="http://richfaces.org/a4j">
 
 <h:head>
@@ -21,9 +22,13 @@
 </h:head>
 
 <h:body>
+  <ds:windowId/>
   <h:form id="form">
     <a4j:commandButton action="#{myViewBean.printName}" render="form" value="Click Me!"/>
+    <a4j:commandButton action="#{myViewBean.explicitlyNavigateToPage2}" render="form" value="Page 2"/>
+    <h:link value="/viewscope/bean.xhtml" />
   </h:form>
+  <a href="bean.xhtml">this bean via a href</a>
 </h:body>
 
 </html>

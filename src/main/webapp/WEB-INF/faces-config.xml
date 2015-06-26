@@ -5,6 +5,15 @@
    version="2.0">
 
   <navigation-rule>
+    <from-view-id>/viewscope/bean.xhtml</from-view-id>
+    <navigation-case>
+      <from-action>#{myViewBean.explicitlyNavigateToPage2}</from-action>
+      <to-view-id>/navigation/page2.xhtml</to-view-id>
+      <redirect/>
+    </navigation-case>
+  </navigation-rule>
+
+  <navigation-rule>
     <from-view-id>/navigation/page1.xhtml</from-view-id>
     <navigation-case>
       <from-action>#{navigationExampleBean.explicitlyNavigateToPage2}</from-action>

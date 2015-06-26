@@ -22,6 +22,7 @@ package org.zanata.bean;
 
 import java.io.Serializable;
 
+import javax.faces.bean.ViewScoped;
 import javax.inject.Named;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -36,7 +37,8 @@ import org.zanata.security.annotations.CheckLoggedIn;
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-@ViewAccessScoped
+//@ViewAccessScoped
+@ViewScoped
 @Named
 public class MyViewBean implements Serializable {
 
@@ -70,4 +72,7 @@ public class MyViewBean implements Serializable {
         // Should fail if the right role is not contained
     }
 
+    public String explicitlyNavigateToPage2() {
+        return null;
+    }
 }
