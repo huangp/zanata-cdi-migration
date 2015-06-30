@@ -25,11 +25,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.deltaspike.core.api.projectstage.ProjectStage;
-import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.apache.deltaspike.core.util.ProjectStageProducer;
-import org.jglue.cdiunit.AdditionalClasspaths;
 import org.jglue.cdiunit.CdiRunner;
 import org.jglue.cdiunit.InRequestScope;
+import org.jglue.cdiunit.deltaspike.SupportDeltaspikeCore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -38,7 +37,7 @@ import java.util.logging.LogManager;
 
 import static org.assertj.core.api.Assertions.*;
 
-@AdditionalClasspaths(BeanProvider.class)
+@SupportDeltaspikeCore
 @InRequestScope
 @RunWith(CdiRunner.class)
 public class ServiceLocatorTest {
