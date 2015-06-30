@@ -28,10 +28,13 @@ import org.apache.deltaspike.core.api.projectstage.ProjectStage;
 import org.apache.deltaspike.core.util.ProjectStageProducer;
 import org.jglue.cdiunit.CdiRunner;
 import org.jglue.cdiunit.InRequestScope;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.jglue.cdiunit.deltaspike.SupportDeltaspikeCore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.zanata.seam.SeamAutowire;
 
 import java.util.logging.LogManager;
 
@@ -43,6 +46,7 @@ import static org.assertj.core.api.Assertions.*;
 public class ServiceLocatorTest {
 
     static {
+        SeamAutowire.instance();
         // redirect JUL to slf4j
         LogManager.getLogManager().reset();
         SLF4JBridgeHandler.install();
@@ -52,7 +56,7 @@ public class ServiceLocatorTest {
     }
 
     @Named
-    public static class DependentBean {
+    public static class DependentTestBean {
     }
 
     @Named("myNamedBean")
@@ -66,7 +70,7 @@ public class ServiceLocatorTest {
     }
 
     @Inject
-    private DependentBean dependentBean;
+    private DependentTestBean dependentBean;
 
     @Inject
     private ExplicitlyNamedBean myNamedBean;
@@ -74,20 +78,30 @@ public class ServiceLocatorTest {
     @Inject
     private NamedBean namedBean;
 
-    @Inject
-    private ServiceLocator locator;
+//    @Inject
+    private IServiceLocator locator = ServiceLocator.instance();
+
+    @BeforeClass
+    public static void beforeClass() {
+        SeamAutowire.useRealServiceLocator = true;
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        SeamAutowire.useRealServiceLocator = false;
+    }
 
     @Test
     public void dependentBeanByClass() throws Exception {
-        DependentBean got = locator.getInstance(DependentBean.class);
+        DependentTestBean got = locator.getInstance(DependentTestBean.class);
         assertThat(got).isNotEqualTo(dependentBean);
         assertThat(got.getClass()).isEqualTo(dependentBean.getClass());
     }
 
     @Test
     public void dependentBeanByName() throws Exception {
-        DependentBean got =
-                locator.getInstance("dependentBean", DependentBean.class);
+        DependentTestBean got =
+                locator.getInstance("dependentTestBean", DependentTestBean.class);
         assertThat(got).isNotEqualTo(dependentBean);
         assertThat(got.getClass()).isEqualTo(dependentBean.getClass());
     }

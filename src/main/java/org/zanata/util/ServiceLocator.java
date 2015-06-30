@@ -21,10 +21,10 @@
 package org.zanata.util;
 
 import org.apache.deltaspike.core.api.provider.BeanProvider;
-import org.apache.deltaspike.core.api.provider.DependentProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.enterprise.inject.Default;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -47,12 +47,13 @@ import java.lang.annotation.Annotation;
  * @author Sean Flanigan <a href="mailto:sflaniga@redhat.com">sflaniga@redhat.com</a>
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
-public class ServiceLocator {
+@Default
+public class ServiceLocator implements IServiceLocator {
     private static Logger log = LoggerFactory.getLogger(ServiceLocator.class);
 
-    private static final ServiceLocator INSTANCE = new ServiceLocator();
+    protected static final IServiceLocator INSTANCE = new ServiceLocator();
 
-    public static ServiceLocator instance() {
+    public static IServiceLocator instance() {
         return INSTANCE;
     }
 
@@ -62,25 +63,30 @@ public class ServiceLocator {
     /**
      * @deprecated Use class and/or qualifiers, not name
      */
+    @Override
     @Deprecated
-    public <T> DependentProvider<T> getDependent(String name, Class<T> clazz) {
+    public <T> DependentBean<T> getDependent(String name, Class<T> clazz) {
         log.warn("Still using name in getDependent({}, {})", name, clazz);
-        return BeanProvider.getDependent(name);
+        return new DependentBean<T>(BeanProvider.<T>getDependent(name));
     }
 
-    public <T> DependentProvider<T> getDependent(Class<T> clazz, Annotation... qualifiers) {
-        return BeanProvider.getDependent(clazz, qualifiers);
+    @Override
+    public <T> DependentBean<T> getDependent(Class<T> clazz,
+            Annotation... qualifiers) {
+        return new DependentBean<T>(BeanProvider.getDependent(clazz, qualifiers));
     }
 
     /**
      * @deprecated Use class and/or qualifiers, not name
      */
+    @Override
     @Deprecated
     public <T> T getInstance(String name, Class<T> clazz) {
         log.warn("Still using name in getInstance({}, {})", name, clazz);
         return BeanProvider.getContextualReference(name, false, clazz);
     }
 
+    @Override
     public <T> T getInstance(Class<T> clazz, Annotation... qualifiers) {
         return BeanProvider.getContextualReference(clazz, qualifiers);
     }
@@ -88,20 +94,24 @@ public class ServiceLocator {
     /**
      * @deprecated Use class and/or qualifiers, not name
      */
+    @Override
     @Deprecated
     public <T> T getInstance(String name, Object scope, Class<T> clazz) {
         log.warn("Ignoring scope in getInstance({}, {}, {})", name, scope, clazz);
         return (T) getInstance(name, clazz);
     }
 
+    @Override
     public EntityManager getEntityManager() {
         return getInstance(EntityManager.class);
     }
 
+    @Override
     public EntityManagerFactory getEntityManagerFactory() {
         return getInstance(EntityManagerFactory.class);
     }
 
+    @Override
     public <T> T getJndiComponent(String jndiName, Class<T> clazz)
             throws NamingException {
         Context ctx = new InitialContext();
