@@ -22,8 +22,8 @@ package org.zanata.security.authentication;
 
 import java.io.IOException;
 
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -34,14 +34,13 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import lombok.extern.slf4j.Slf4j;
-import org.picketlink.annotations.PicketLink;
 import org.picketlink.authentication.BaseAuthenticator;
 import org.picketlink.credential.DefaultLoginCredentials;
-import org.picketlink.idm.credential.Credentials;
 import org.picketlink.idm.model.basic.User;
+import org.zanata.model.HAccount;
+import org.zanata.model.HPerson;
 import org.zanata.security.credentials.OpenIdCredentials;
 
-import static org.picketlink.idm.credential.Credentials.Status.IN_PROGRESS;
 import static org.zanata.security.authentication.AuthType.INTERNAL;
 import static org.zanata.security.authentication.AuthType.KERBEROS;
 import static org.zanata.security.authentication.AuthType.OPENID;
@@ -49,7 +48,7 @@ import static org.zanata.security.authentication.AuthType.OPENID;
 /**
  * Initiates an authentication request in accordance with the type of
  * credentials being authenticated.
- * 
+ *
  * @author Carlos Munoz <a
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
@@ -58,6 +57,9 @@ public class JAASAuthenticator extends BaseAuthenticator {
 
     @Inject
     private AuthenticatorSelector authenticatorSelector;
+
+    @Inject
+    private EntityManager entityManager;
 
     @Override
     public void authenticate() {
@@ -68,7 +70,17 @@ public class JAASAuthenticator extends BaseAuthenticator {
                             getCallbackHandler());
             delegate.login();
             setStatus(AuthenticationStatus.SUCCESS);
-            setAccount(new User("undefined"));
+
+            // TODO [CDI] use picketlink IDM features
+            String username =
+                    delegate.getSubject().getPrincipals().iterator().next()
+                            .getName();
+            HAccount hAccount = entityManager
+                    .createQuery("from HAccount where username =:username", HAccount.class)
+                    .setParameter("username", username)
+                    .getSingleResult();
+
+            setAccount(new ZanataUser(hAccount));
         } catch (LoginException e) {
             log.error("Exception authenticating with JAAS", e);
             setStatus(AuthenticationStatus.FAILURE);

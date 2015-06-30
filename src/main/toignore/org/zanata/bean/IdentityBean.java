@@ -20,7 +20,13 @@
  */
 package org.zanata.bean;
 
+import org.picketlink.idm.model.Account;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zanata.model.HAccount;
 import org.zanata.security.ExtendedIdentity;
+import org.zanata.security.annotations.Authenticated;
+import org.zanata.security.authentication.ZanataUser;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,10 +37,28 @@ import javax.inject.Named;
  */
 @Named
 public class IdentityBean {
+    private static final Logger log =
+            LoggerFactory.getLogger(IdentityBean.class);
     @Inject
     private ExtendedIdentity identity;
 
+    @Inject @Authenticated
+    private HAccount authenticated;
+
     public boolean isLoggedIn() {
         return identity.isLoggedIn();
+    }
+
+    public Account getAccount() {
+        Account account = identity.getAccount();
+        if (account instanceof ZanataUser) {
+            log.info("logged in account {}:", ((ZanataUser) account).getAccount());
+        }
+        return account;
+    }
+
+    public String getAuthenticated() {
+        log.info("authenticated: {}", authenticated);
+        return authenticated == null ? "null" : authenticated.getUsername();
     }
 }

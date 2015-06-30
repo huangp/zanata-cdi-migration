@@ -22,13 +22,22 @@ package org.zanata.security;
 
 import java.io.Serializable;
 
+import javax.annotation.Nullable;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import lombok.Delegate;
 
 import org.picketlink.Identity;
+import org.picketlink.idm.model.Account;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.zanata.model.HAccount;
+import org.zanata.security.annotations.Authenticated;
+import org.zanata.security.authentication.ZanataUser;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
@@ -36,8 +45,35 @@ import org.picketlink.Identity;
 @SessionScoped
 @Named("extendedIdentity")
 public class ExtendedIdentity implements Serializable {
+    private static final Logger log =
+            LoggerFactory.getLogger(ExtendedIdentity.class);
 
     @Inject
     @Delegate
     private Identity identity;
+
+
+    @Produces
+    @Dependent
+    @Deprecated
+    public @Nullable
+    HAccount authenticatedAccount() {
+        return qualifiedAuthenticatedAccount();
+    }
+
+    @Produces
+    @Dependent
+    @Authenticated
+    // original full name is: org.jboss.seam.security.management.authenticatedUser
+    @Named("authenticatedUser")
+    // WELD-000052 Cannot return null from a non-dependent producer method:
+    public @Nullable HAccount qualifiedAuthenticatedAccount() {
+        HAccount authenticatedAccount = null;
+        Account account = identity.getAccount();
+        if (account != null && account instanceof ZanataUser) {
+            authenticatedAccount = ((ZanataUser) account).getAccount();
+            log.debug("authenticated account: {}", authenticatedAccount);
+        }
+        return authenticatedAccount;
+    }
 }

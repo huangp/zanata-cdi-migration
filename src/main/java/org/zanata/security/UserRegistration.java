@@ -20,15 +20,21 @@
  */
 package org.zanata.security;
 
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.credential.Password;
 import org.picketlink.idm.model.basic.User;
+import org.zanata.model.HAccount;
+import org.zanata.model.HPerson;
+import org.zanata.security.authentication.ZanataUser;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.persistence.EntityManager;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
@@ -38,6 +44,9 @@ import javax.inject.Named;
 public class UserRegistration {
     @Inject
     private IdentityManager identityManager;
+
+    @Inject
+    private EntityManager entityManager;
 
     @Getter @Setter
     private String loginName;
@@ -49,14 +58,30 @@ public class UserRegistration {
     private String password;
 
     public String register() {
-        User newUser = new User(this.loginName);
-
-        newUser.setFirstName(this.firstName);
-        newUser.setLastName(this.lastName);
-
-        this.identityManager.add(newUser);
-
         Password password = new Password(this.password);
+
+        HAccount account = new HAccount();
+        HPerson person = new HPerson();
+        person.setAccount(account);
+        account.setPerson(person);
+        account.setUsername(loginName);
+        person.setEmail(loginName + "@example.com");
+        person.setName(firstName + ' ' + lastName);
+        Date creationDate = new Date();
+        person.setCreationDate(creationDate);
+        person.setLastChanged(creationDate);
+        account.setCreationDate(creationDate);
+        account.setLastChanged(creationDate);
+        account.setPasswordHash(new String(password.getValue()));
+        account.setEnabled(true);
+
+        entityManager.getTransaction().begin();
+        entityManager.persist(account);
+        entityManager.getTransaction().commit();
+
+        ZanataUser newUser = new ZanataUser(account);
+        // TODO [CDI] use picketlink IDM model
+        this.identityManager.add(newUser);
 
         this.identityManager.updateCredential(newUser, password);
 

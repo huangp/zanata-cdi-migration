@@ -1,7 +1,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
   xmlns:ui="http://java.sun.com/jsf/facelets"
-  xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core">
+  xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:ds="http://deltaspike.apache.org/jsf">
 <body>
+<ds:windowId/>
 <ui:fragment rendered="#{not identity.loggedIn}">
   Please, enter your credentials:<br/><br/>
   <h:form>

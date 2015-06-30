@@ -20,18 +20,14 @@
  */
 package org.zanata.security.jaas;
 
-import java.util.Map;
-
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
-import javax.security.auth.Subject;
-import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.LoginException;
-import javax.security.auth.spi.LoginModule;
 
-import org.apache.deltaspike.core.api.provider.BeanProvider;
+import org.jboss.security.SimplePrincipal;
 import org.picketlink.credential.DefaultLoginCredentials;
 import org.zanata.model.HAccount;
+import sun.security.acl.PrincipalImpl;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
@@ -56,6 +52,7 @@ public class InternalLoginModule extends ZanataLoginModule {
 
         // TODO Actually check a password
         if(account != null) {
+            subject.getPrincipals().add(new SimplePrincipal(account.getUsername()));
             return true;
         }
         else {
