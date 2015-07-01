@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.zanata.seam.SeamAutowire;
+import org.zanata.test.CdiUnitRunner;
 
 import java.util.logging.LogManager;
 
@@ -42,7 +43,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SupportDeltaspikeCore
 @InRequestScope
-@RunWith(CdiRunner.class)
+@RunWith(CdiUnitRunner.class)
 public class ServiceLocatorTest {
 
     static {
@@ -80,16 +81,6 @@ public class ServiceLocatorTest {
 
 //    @Inject
     private IServiceLocator locator = ServiceLocator.instance();
-
-    @BeforeClass
-    public static void beforeClass() {
-        SeamAutowire.useRealServiceLocator = true;
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        SeamAutowire.useRealServiceLocator = false;
-    }
 
     @Test
     public void dependentBeanByClass() throws Exception {
