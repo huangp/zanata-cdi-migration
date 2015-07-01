@@ -22,7 +22,8 @@ package org.zanata.async;
 
 import com.google.common.base.Optional;
 import com.google.common.util.concurrent.ListenableFuture;
-import org.apache.deltaspike.core.api.provider.BeanProvider;
+import org.zanata.util.BeanHolder;
+import org.zanata.util.ServiceLocator;
 
 import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;
@@ -46,6 +47,14 @@ public class AsyncMethodInterceptor {
     @Inject
     private AsyncTaskHandleManager taskHandleManager;
 
+//    AsyncMethodInterceptor() {}
+
+//    @Inject
+//    AsyncMethodInterceptor(AsynchronousTaskManager taskManager, AsyncTaskHandleManager taskHandleManager) {
+//        this.taskManager = taskManager;
+//        this.taskHandleManager = taskHandleManager;
+//    }
+
     @AroundInvoke
     public Object callAsync(final InvocationContext ctx) throws Exception {
 
@@ -64,12 +73,14 @@ public class AsyncMethodInterceptor {
                         if( handle.isPresent() ) {
                             handle.get().startTiming();
                         }
-                        Object target =
-                                BeanProvider
-                                        .getContextualReference(ctx.getMethod()
-                                                .getDeclaringClass(), false);
-                        return ctx.getMethod().invoke(target,
-                                ctx.getParameters());
+                        Class<?> beanClass = ctx.getMethod().getDeclaringClass();
+
+                        // TODO [CDI] handle qualifiers?
+                        try (BeanHolder<?> bean = ServiceLocator.instance()
+                                .getDependent(beanClass)) {
+                            return ctx.getMethod().invoke(bean.get(),
+                                    ctx.getParameters());
+                        }
                     }
                     finally {
                         interceptorRan.remove();

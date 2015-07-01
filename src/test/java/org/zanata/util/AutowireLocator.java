@@ -56,12 +56,12 @@ public class AutowireLocator implements IServiceLocator {
 
     }
 
-    public <T> DependentBean<T> getDependent(String name, Class<T> clazz) {
-        return new DependentBean<T>(getInstance(name, clazz));
+    public <T> BeanHolder<T> getDependent(String name, Class<T> clazz) {
+        return new BeanHolder<T>(getInstance(name, clazz));
     }
 
-    public <T> DependentBean<T> getDependent(Class<T> clazz, Annotation... qualifiers) {
-        return new DependentBean<T>(getInstance(clazz, qualifiers));
+    public <T> BeanHolder<T> getDependent(Class<T> clazz, Annotation... qualifiers) {
+        return new BeanHolder<T>(getInstance(clazz, qualifiers));
     }
 
     public <T> T getInstance(String name, Class<T> clazz) {

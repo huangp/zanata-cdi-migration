@@ -65,15 +65,15 @@ public class ServiceLocator implements IServiceLocator {
      */
     @Override
     @Deprecated
-    public <T> DependentBean<T> getDependent(String name, Class<T> clazz) {
+    public <T> BeanHolder<T> getDependent(String name, Class<T> clazz) {
         log.warn("Still using name in getDependent({}, {})", name, clazz);
-        return new DependentBean<T>(BeanProvider.<T>getDependent(name));
+        return new BeanHolder<T>(BeanProvider.<T>getDependent(name));
     }
 
     @Override
-    public <T> DependentBean<T> getDependent(Class<T> clazz,
+    public <T> BeanHolder<T> getDependent(Class<T> clazz,
             Annotation... qualifiers) {
-        return new DependentBean<T>(BeanProvider.getDependent(clazz, qualifiers));
+        return new BeanHolder<T>(BeanProvider.getDependent(clazz, qualifiers));
     }
 
     /**

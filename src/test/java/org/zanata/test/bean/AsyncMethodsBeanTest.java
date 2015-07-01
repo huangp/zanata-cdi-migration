@@ -27,10 +27,10 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.deltaspike.cdise.weld.WeldContextControl;
-import org.apache.deltaspike.core.api.provider.BeanManagerProvider;
 import org.jglue.cdiunit.AdditionalClasses;
 import org.jglue.cdiunit.CdiRunner;
 import org.jglue.cdiunit.InRequestScope;
+import org.jglue.cdiunit.deltaspike.SupportDeltaspikeCore;
 import org.jglue.cdiunit.internal.servlet.MockHttpServletRequestImpl;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -45,8 +45,8 @@ import org.zanata.bean.SessionStorageBean;
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @RunWith(CdiRunner.class)
-@AdditionalClasses({AsyncMethodInterceptor.class, BeanManagerProvider.class,
-        WeldContextControl.class})
+@AdditionalClasses({AsyncMethodInterceptor.class, WeldContextControl.class})
+@SupportDeltaspikeCore
 //@Ignore("cdi-unit race condition in ContextController")
 public class AsyncMethodsBeanTest {
 

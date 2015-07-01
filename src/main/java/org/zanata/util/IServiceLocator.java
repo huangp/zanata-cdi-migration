@@ -27,9 +27,20 @@ import javax.persistence.EntityManagerFactory;
 
 public interface IServiceLocator {
     @Deprecated
-    <T> DependentBean<T> getDependent(String name, Class<T> clazz);
+    <T> BeanHolder<T> getDependent(String name, Class<T> clazz);
 
-    <T> DependentBean<T> getDependent(Class<T> clazz,
+    /**
+     * Returns a BeanHolder for the relevant CDI bean, which must be
+     * closed when no longer needed (eg end of the calling method).
+     * This is necessary for correct lifecycle management of dependent
+     * beans.  Destroying a BeanHolder for a non-dependent bean is
+     * a no-op.
+     * @param clazz
+     * @param qualifiers
+     * @param <T>
+     * @return
+     */
+    <T> BeanHolder<T> getDependent(Class<T> clazz,
             Annotation... qualifiers);
 
     @Deprecated

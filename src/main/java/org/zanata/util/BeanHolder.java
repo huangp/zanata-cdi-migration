@@ -9,29 +9,35 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * @author Patrick Huang
  *         <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
+ * @author Sean Flanigan <a href="mailto:sflaniga@redhat.com">sflaniga@redhat.com</a>
  */
-public class DependentBean<T> implements Provider<T>, AutoCloseable,
+public class BeanHolder<T> implements Provider<T>, AutoCloseable,
         Serializable {
     private final DependentProvider<T> provider;
     private final T bean;
 
-    public DependentBean(DependentProvider<T> provider) {
+    public BeanHolder(DependentProvider<T> provider) {
         this.provider = provider;
         bean = null;
     }
 
     @VisibleForTesting
-    public DependentBean(T bean) {
+    BeanHolder(T bean) {
         this.bean = bean;
         provider = null;
     }
 
+    /**
+     * This will not do anything for normal scoped (non-dependent) beans,
+     * nor for beans handled in autowire tests.
+     * @throws Exception
+     */
     @Override
     public void close() throws Exception {
         if (provider != null) {
             provider.destroy();
         } else {
-            //N.B. lifecycle method will not be run in test
+            // NB lifecycle method will not be run in autowire tests
         }
     }
 
