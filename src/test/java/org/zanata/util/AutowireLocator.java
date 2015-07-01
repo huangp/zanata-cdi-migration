@@ -56,6 +56,7 @@ public class AutowireLocator implements IServiceLocator {
 
     }
 
+    @Deprecated
     public <T> BeanHolder<T> getDependent(String name, Class<T> clazz) {
         return new BeanHolder<T>(getInstance(name, clazz));
     }
@@ -64,27 +65,21 @@ public class AutowireLocator implements IServiceLocator {
         return new BeanHolder<T>(getInstance(clazz, qualifiers));
     }
 
+    @Deprecated
     public <T> T getInstance(String name, Class<T> clazz) {
         return (T) SeamAutowire.instance().getComponent(name);
     }
 
     public <T> T getInstance(Class<T> clazz, Annotation... qualifiers) {
-        if (qualifiers.length != 0) {
-            log.warn(
-                    "qualifier will be ignored in SeamAutowire test. Class:{}, Qualifiers:{}",
-                    clazz,
-                    Lists.newArrayList(qualifiers));
+        try {
+            T bean = ServiceLocator.INSTANCE.getInstance(clazz, qualifiers);
+            log.debug("Returning CDI bean: {}", bean);
+            return bean;
+        } catch (IllegalStateException e) {
+            log.debug("Can't find CDI bean, trying SeamAutowire",
+                    e.getMessage());
+            return SeamAutowire.instance().getComponent(clazz, qualifiers);
         }
-        Named annotation = clazz.getAnnotation(Named.class);
-        if (annotation != null) {
-            String name = annotation.value();
-            if (Strings.isNullOrEmpty(name)) {
-                return getInstance(
-                        StringUtils.uncapitalize(clazz.getSimpleName()), clazz);
-            }
-            return getInstance(name, clazz);
-        }
-        throw new UnsupportedOperationException("don't support look up by qualifiers only");
     }
 
     public <T> T getInstance(String name, Object scope, Class<T> clazz) {
@@ -106,23 +101,5 @@ public class AutowireLocator implements IServiceLocator {
             throws NamingException {
         return getInstance(jndiName, clazz);
     }
-
-    //    public static Object getInstance(String name, ScopeType scope,
-//            boolean create, boolean allowAutocreation) {
-//        return SeamAutowire.instance().getComponent(name);
-//    }
-//
-//    public static Object getInstance(Class<?> clazz, ScopeType scopeType) {
-//        return SeamAutowire.instance().autowire(clazz);
-//    }
-//
-//    private static Object getInstance(Class<?> clazz) {
-//        return SeamAutowire.instance().autowire(clazz);
-//    }
-//
-//    public static Object getInstance(String name, boolean create,
-//            boolean allowAutoCreation, Object result, ScopeType scopeType) {
-//        return SeamAutowire.instance().getComponent(name);
-//    }
 
 }

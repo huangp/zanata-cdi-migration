@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Red Hat, Inc. and individual contributors as indicated by the
+ * Copyright 2010-2015, Red Hat, Inc. and individual contributors as indicated by the
  * @author tags. See the copyright.txt file in the distribution for a full
  * listing of individual contributors.
  *
@@ -26,6 +26,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,8 +35,8 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
+import com.google.common.collect.Lists;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -47,20 +48,46 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
 import org.zanata.util.AutowireLocator;
 
-import com.google.common.base.Preconditions;
-
 /**
  * Helps with Auto-wiring of Seam components for integrated tests without the
  * need for a full Seam environment. It's a singleton class that upon first use
- * will change the way Seam's {@link org.jboss.seam.Component} class works by
+ * will change the way the {@link org.zanata.util.ServiceLocator} class works by
  * returning its own auto-wired components.
- *
- * Supports components injected using: {@link In} {@link Logger}
- * {@link org.jboss.seam.Component#getInstance(String)} and similar methods...
- * and that have no-arg constructors
+ * <p>
+ * Note: If CDI-Unit is active, the modified ServiceLocator will attempt
+ * to use real CDI beans first, otherwise falling back on Autowire
+ * components if available.
+ * </p>
+ * <p>
+ * Supports components injected using: {@link Inject},
+ * {@link org.zanata.util.ServiceLocator#getInstance(String, Class)} and similar methods...
+ * and which have no-arg constructors.
+ * </p>
+ * <p>
+ * Limitations:
+ * <ul>
+ *     <li>Injection by name is only supported where use(String, Object)
+ *     has been called beforehand. Otherwise, injection will be done by
+ *     class/interface.</li>
+ *     <li>Injection by class or interface is only supported where
+ *     useImpl(Class) has been called beforehand.</li>
+ *     <li>Injection by class or interface creates a new instance of the
+ *     bean class at each injection point.</li>
+ *     <li>There is only one, global, scope.  All scope annotations are
+ *     ignored.</li>
+ *     <li>Lifecycle methods are ignored.</li>
+ *     <li>Injection of unnamed beans may not work (Seam components
+ *     always have names).</li>
+ *     <li>CDI qualifiers are ignored with a warning.</li>
+ *     <li>Beans with the same name or interfaces will silently overwrite
+ *     each other in the autowire scope.</li>
+ * </ul>
  *
  * @author Carlos Munoz <a
  *         href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
+ * @author Sean Flanigan <a href="mailto:sflaniga@redhat.com">sflaniga@redhat.com</a>
+ * @author Patrick Huang
+ *         <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
 @Slf4j
 public class SeamAutowire {
@@ -72,6 +99,9 @@ public class SeamAutowire {
 
     private Map<String, Object> namedComponents = new HashMap<String, Object>();
 
+    /**
+     * key is an interface Class, values is the concrete component Class
+     */
     private Map<Class<?>, Class<?>> componentImpls =
             new HashMap<Class<?>, Class<?>>();
 
@@ -81,9 +111,6 @@ public class SeamAutowire {
 
     static {
         rewireServiceLocatorClass();
-//        rewireSeamComponentClass();
-//        rewireSeamTransactionClass();
-//        rewireSeamContextsClass();
     }
 
     protected SeamAutowire() {
@@ -143,6 +170,9 @@ public class SeamAutowire {
             throw new RuntimeException("Component "+name+" was already created.  You should register it before it is resolved.");
         }
         namedComponents.put(name, component);
+        // we could register the parent interfaces, but note that
+        // getComponent(Class) currently constructs a new instance every time
+//        this.registerInterfaces(component.getClass());
         return this;
     }
 
@@ -154,9 +184,9 @@ public class SeamAutowire {
      *            The class to register.
      */
     public SeamAutowire useImpl(Class<?> cls) {
-        if (cls.isInterface()) {
+        if (Modifier.isAbstract(cls.getModifiers())) {
             throw new RuntimeException("Class " + cls.getName()
-                    + " is an interface.");
+                    + " is abstract.");
         }
         this.registerInterfaces(cls);
 
@@ -183,6 +213,16 @@ public class SeamAutowire {
      */
     public Object getComponent(String name) {
         return namedComponents.get(name);
+    }
+
+    public <T> T getComponent(Class<T> componentClass, Annotation... qualifiers) {
+        if (qualifiers.length != 0) {
+            log.warn(
+                    "Qualifiers currently not supported by SeamAutowire.  Try CDI-Unit and CdiUnitRunner. Class:{}, Qualifiers:{}",
+                    componentClass,
+                    Lists.newArrayList(qualifiers));
+        }
+        return autowire(componentClass);
     }
 
     /**
@@ -236,9 +276,9 @@ public class SeamAutowire {
     private <T> Class<T> getImplClass(Class<T> fieldClass) {
         // If the component type is an interface, try to find a declared
         // implementation
-        // TODO field class might be abstract, or a concrete superclass
+        // TODO field class might a concrete superclass
         // of the impl class
-        if (fieldClass.isInterface()
+        if (Modifier.isAbstract(fieldClass.getModifiers())
                 && this.componentImpls.containsKey(fieldClass)) {
             fieldClass = (Class<T>) this.componentImpls.get(fieldClass);
         }
@@ -256,6 +296,10 @@ public class SeamAutowire {
      * @return The autowired component.
      */
     public <T> T autowire(Class<T> componentClass) {
+        // We could use getComponentName(Class) to simulate Seam's lookup
+        // (by the @Named annotation on the injection point's class), but
+        // this would just move us further away from CDI semantics.
+        // TODO don't create multiple instances of a class
         return autowire(create(componentClass));
     }
 
@@ -530,7 +574,7 @@ public class SeamAutowire {
     }
 
     private void registerInterfaces(Class<?> cls) {
-        assert !cls.isInterface();
+        assert !Modifier.isAbstract(cls.getModifiers());
         // register all interfaces registered by this component
         for (Class<?> iface : getAllInterfaces(cls)) {
             this.componentImpls.put(iface, cls);
@@ -584,10 +628,15 @@ public class SeamAutowire {
         }
     }
 
-    public static String getComponentName(Class componentClass) {
-        Annotation name = componentClass.getAnnotation(Named.class);
-        Preconditions.checkNotNull(name);
-        return ((Named) name).value();
-    }
+//    public static String getComponentName(Class<?> clazz) {
+//        Named named = clazz.getAnnotation(Named.class);
+//        if (named == null) {
+//            return null;
+//        }
+//        if (named.value().isEmpty()) {
+//            return StringUtils.uncapitalize(clazz.getSimpleName());
+//        }
+//        return named.value();
+//    }
 
 }

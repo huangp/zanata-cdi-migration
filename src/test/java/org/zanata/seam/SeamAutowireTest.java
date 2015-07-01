@@ -40,8 +40,10 @@ import org.zanata.seam.test.ComponentWithRequiredAutoCreateChild;
 import org.zanata.seam.test.ComponentWithRequiredBrokenChild;
 import org.zanata.seam.test.ComponentWithRequiredCreateChild;
 import org.zanata.seam.test.ComponentWithRequiredNoCreateChild;
+import org.zanata.seam.test.ConcreteClass;
 import org.zanata.seam.test.CopyTransService;
 import org.zanata.seam.test.CopyTransServiceImpl;
+import org.zanata.seam.test.InterfaceForConcreteClass;
 import org.zanata.util.ServiceLocator;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
@@ -103,7 +105,8 @@ public class SeamAutowireTest extends ZanataDbunitJpaTest {
     @Test(expected = RuntimeException.class)
 //            expectedExceptionsMessageRegExp = "Could not auto-wire component of type .*. No no-args constructor."
     public void brokenChild() {
-        SeamAutowire.instance().autowire(ComponentWithNonRequiredBrokenChild.class);
+        SeamAutowire.instance().autowire(
+                ComponentWithNonRequiredBrokenChild.class);
     }
 
     @Test
@@ -121,6 +124,31 @@ public class SeamAutowireTest extends ZanataDbunitJpaTest {
                         .autowire(ComponentWithRequiredAutoCreateChild.class);
 
         assertThat(test.isPostConstructInvoked(), is(true));
+    }
+
+    @Test
+    public void testUnregisteredClass() {
+        SeamAutowire autowire = SeamAutowire.instance();
+        assertThat(autowire.getComponent(ConcreteClass.class), notNullValue());
+    }
+
+    @Test
+    public void testRegisteredClassByInterface() {
+        SeamAutowire autowire = SeamAutowire.instance();
+        autowire.useImpl(ConcreteClass.class);
+        assertThat(autowire.getComponent(InterfaceForConcreteClass.class),
+                notNullValue());
+        assertThat(autowire.getComponent(ConcreteClass.class), notNullValue());
+    }
+
+    @Test
+    public void testRegisteredInstanceByName() {
+        SeamAutowire autowire = SeamAutowire.instance();
+        autowire.use("concrete", new ConcreteClass());
+//        assertThat(autowire.getComponent(InterfaceForConcreteClass.class),
+//                notNullValue());
+//        assertThat(autowire.getComponent(ConcreteClass.class), notNullValue());
+        assertThat(autowire.getComponent("concrete"), notNullValue());
     }
 
     @Test

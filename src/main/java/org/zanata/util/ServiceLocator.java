@@ -51,7 +51,7 @@ import java.lang.annotation.Annotation;
 public class ServiceLocator implements IServiceLocator {
     private static Logger log = LoggerFactory.getLogger(ServiceLocator.class);
 
-    protected static final IServiceLocator INSTANCE = new ServiceLocator();
+    protected static final ServiceLocator INSTANCE = new ServiceLocator();
 
     public static IServiceLocator instance() {
         return INSTANCE;
