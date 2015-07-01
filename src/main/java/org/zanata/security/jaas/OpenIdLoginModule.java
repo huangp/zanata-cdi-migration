@@ -21,9 +21,13 @@
 package org.zanata.security.jaas;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import javax.security.auth.login.LoginException;
 
 import org.openid4java.consumer.ConsumerManager;
+import org.zanata.security.HCredentials;
+import org.zanata.security.HOpenIdCredentials;
+import org.zanata.security.credentials.OpenIdCredentials;
 import org.zanata.security.openid.OpenIdAuthenticationManager;
 
 /**
@@ -35,11 +39,26 @@ public class OpenIdLoginModule extends ZanataLoginModule {
     @Inject
     private OpenIdAuthenticationManager openIdAuthenticationManager;
 
+    @Inject
+    private OpenIdCredentials credentials;
+
+    @Inject
+    private EntityManager entityManager;
+
     @Override
     public boolean login() throws LoginException {
         try {
             // This verifies the response and does the login
             openIdAuthenticationManager.verifyResponse();
+
+            // TODO [CDI] verify this is correct
+            HCredentials hCredentials = entityManager
+                    .createQuery("from HOpenIdCredentials where user = :user",
+                            HCredentials.class)
+                    .setParameter("user", this.credentials.getOpenId())
+                    .getSingleResult();
+
+            subject.getPrincipals().add(new CredentialPrincipal(hCredentials));
         }
         catch (Exception e) {
             throw new LoginException(e.getMessage());

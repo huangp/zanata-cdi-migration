@@ -66,6 +66,7 @@ public class OpenIdAuthenticationManager implements Serializable {
     @Inject
     private transient AuthenticatorSelector authenticatorSelector;
 
+    // FIXME [CDI] can not inject non serializable bean into session scope
     @Inject @DeltaSpike
     private transient HttpServletRequest request;
 

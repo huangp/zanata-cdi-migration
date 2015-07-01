@@ -24,7 +24,7 @@ import org.picketlink.idm.model.Account;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.model.HAccount;
-import org.zanata.security.ExtendedIdentity;
+import org.zanata.security.ZanataIdentity;
 import org.zanata.security.annotations.Authenticated;
 import org.zanata.security.authentication.ZanataUser;
 
@@ -40,7 +40,7 @@ public class IdentityBean {
     private static final Logger log =
             LoggerFactory.getLogger(IdentityBean.class);
     @Inject
-    private ExtendedIdentity identity;
+    private ZanataIdentity identity;
 
     @Inject @Authenticated
     private HAccount authenticated;

@@ -52,7 +52,7 @@ public class InternalLoginModule extends ZanataLoginModule {
 
         // TODO Actually check a password
         if(account != null) {
-            subject.getPrincipals().add(new SimplePrincipal(account.getUsername()));
+            subject.getPrincipals().add(new AccountPrincipal(account));
             return true;
         }
         else {

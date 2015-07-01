@@ -21,6 +21,7 @@
 package org.zanata.security.authentication;
 
 import java.io.IOException;
+import java.security.Principal;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -40,6 +41,11 @@ import org.picketlink.idm.model.basic.User;
 import org.zanata.model.HAccount;
 import org.zanata.model.HPerson;
 import org.zanata.security.credentials.OpenIdCredentials;
+import org.zanata.security.jaas.AccountPrincipal;
+import org.zanata.security.jaas.CredentialPrincipal;
+
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
 
 import static org.zanata.security.authentication.AuthType.INTERNAL;
 import static org.zanata.security.authentication.AuthType.KERBEROS;
@@ -72,15 +78,9 @@ public class JAASAuthenticator extends BaseAuthenticator {
             setStatus(AuthenticationStatus.SUCCESS);
 
             // TODO [CDI] use picketlink IDM features
-            String username =
-                    delegate.getSubject().getPrincipals().iterator().next()
-                            .getName();
-            HAccount hAccount = entityManager
-                    .createQuery("from HAccount where username =:username", HAccount.class)
-                    .setParameter("username", username)
-                    .getSingleResult();
+            ZanataUser authenticatedUser = getAuthenticatedUser(subject);
 
-            setAccount(new ZanataUser(hAccount));
+            setAccount(authenticatedUser);
         } catch (LoginException e) {
             log.error("Exception authenticating with JAAS", e);
             setStatus(AuthenticationStatus.FAILURE);
@@ -100,16 +100,18 @@ public class JAASAuthenticator extends BaseAuthenticator {
         return null;
     }
 
-    private User getAuthenticatedUser() {
+    private ZanataUser getAuthenticatedUser(Subject subject) {
+        // DefaultLoginCredentials is used for everything except openID
         if (authenticatorSelector.getCredentials() instanceof DefaultLoginCredentials) {
-            return new User(
-                    ((DefaultLoginCredentials) authenticatorSelector
-                            .getCredentials()).getUserId());
-        }
-        else if(authenticatorSelector.getCredentials() instanceof OpenIdCredentials) {
-            return new User(
-                    ((OpenIdCredentials) authenticatorSelector.getCredentials())
-                            .getOpenId());
+            AccountPrincipal principal = (AccountPrincipal) Iterables
+                    .find(subject.getPrincipals(), Predicates.instanceOf(
+                            AccountPrincipal.class));
+            return new ZanataUser(principal.getAccount());
+        } else if(authenticatorSelector.getCredentials() instanceof OpenIdCredentials) {
+            CredentialPrincipal principal = (CredentialPrincipal) Iterables
+                    .find(subject.getPrincipals(), Predicates.instanceOf(
+                            CredentialPrincipal.class));
+            return new ZanataUser(principal.getAccount());
         }
         return null;
     }

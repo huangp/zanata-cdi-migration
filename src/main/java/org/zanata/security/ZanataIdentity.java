@@ -43,10 +43,10 @@ import org.zanata.security.authentication.ZanataUser;
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
  */
 @SessionScoped
-@Named("extendedIdentity")
-public class ExtendedIdentity implements Serializable {
+@Named("zanataIdentity")
+public class ZanataIdentity implements Serializable {
     private static final Logger log =
-            LoggerFactory.getLogger(ExtendedIdentity.class);
+            LoggerFactory.getLogger(ZanataIdentity.class);
 
     @Inject
     @Delegate
@@ -56,7 +56,7 @@ public class ExtendedIdentity implements Serializable {
     @Produces
     @Dependent
     @Deprecated
-    public @Nullable
+    @Nullable
     HAccount authenticatedAccount() {
         return qualifiedAuthenticatedAccount();
     }
@@ -67,12 +67,15 @@ public class ExtendedIdentity implements Serializable {
     // original full name is: org.jboss.seam.security.management.authenticatedUser
     @Named("authenticatedUser")
     // WELD-000052 Cannot return null from a non-dependent producer method:
-    public @Nullable HAccount qualifiedAuthenticatedAccount() {
-        HAccount authenticatedAccount = null;
+    @Nullable HAccount qualifiedAuthenticatedAccount() {
+        HAccount authenticatedAccount;
         Account account = identity.getAccount();
         if (account != null && account instanceof ZanataUser) {
             authenticatedAccount = ((ZanataUser) account).getAccount();
             log.debug("authenticated account: {}", authenticatedAccount);
+        } else {
+            log.error("account in identity is not an instance of ZanataUser: {}. Returning null", account);
+            return null;
         }
         return authenticatedAccount;
     }

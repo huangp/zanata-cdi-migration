@@ -24,6 +24,7 @@ import java.util.Date;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.deltaspike.jpa.api.transaction.Transactional;
 import org.picketlink.idm.IdentityManager;
 import org.picketlink.idm.credential.Password;
 import org.picketlink.idm.model.basic.User;
@@ -57,6 +58,7 @@ public class UserRegistration {
     @Getter @Setter
     private String password;
 
+    @Transactional
     public String register() {
         Password password = new Password(this.password);
 
@@ -72,18 +74,17 @@ public class UserRegistration {
         person.setLastChanged(creationDate);
         account.setCreationDate(creationDate);
         account.setLastChanged(creationDate);
+        // TODO [CDI] password hash algorithm needs to match
         account.setPasswordHash(new String(password.getValue()));
         account.setEnabled(true);
 
-        entityManager.getTransaction().begin();
         entityManager.persist(account);
-        entityManager.getTransaction().commit();
 
         ZanataUser newUser = new ZanataUser(account);
-        // TODO [CDI] use picketlink IDM model
-        this.identityManager.add(newUser);
+        // TODO [CDI] use picketlink IDM model (If configure correctly below method should insert the record to IdentityStore). The default is FileIdentityStore.
+//        this.identityManager.add(newUser);
 
-        this.identityManager.updateCredential(newUser, password);
+//        this.identityManager.updateCredential(newUser, password);
 
         return "/security/signin.xhtml";
     }
