@@ -38,6 +38,9 @@ import org.apache.deltaspike.cdise.api.ContextControl;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 
 import com.google.common.util.concurrent.ListenableFuture;
+import org.zanata.model.HAccount;
+import org.zanata.security.ZanataIdentity;
+import org.zanata.util.ServiceLocator;
 
 /**
  * @author Carlos Munoz <a href="mailto:camunoz@redhat.com">camunoz@redhat.com</a>
@@ -61,34 +64,47 @@ public class AsynchronousTaskManager {
     public <V> ListenableFuture<V> startTask(final @Nonnull AsyncTask<Future<V>> task) {
 
         final AsyncTaskResult<V> taskFuture = new AsyncTaskResult<V>();
+
+        // capture the current user for later use
+        final HAccount account = ServiceLocator.instance().getInstance(HAccount.class);
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                ContextControl ctxCtrl = null;
-                try {
-                    ctxCtrl = BeanProvider
-                            .getContextualReference(ContextControl.class);
-                    ctxCtrl.startContexts();
-                    // TODO Security context. Make sure the new thread has the same
-                    // security identity as the one that created it.
+                ServiceLocator.instance().getInstance(ZanataIdentity.class).runAs(
+                        account, new Runnable() {
+                            @Override
+                            public void run() {
+                                ContextControl ctxCtrl = null;
+                                try {
+                                    ctxCtrl = BeanProvider
+                                            .getContextualReference(ContextControl.class);
+                                    ctxCtrl.startContexts();
+                                    // TODO Security context. Make sure the new thread has the same
+                                    // security identity as the one that created it.
+                                    // TODO login using usernameCredentials
 
-                    Future<V> returnValue = task.call();
-                    taskFuture.set(returnValue.get());
-                }
-                catch(Throwable t) {
-                    taskFuture.setException(t);
-                    // TODO log unimportant exceptions as WARN
-                    // but make sure this doesn't lead to unlogged 500 errors
-                    log.error(
-                            "Exception when executing an asynchronous task.", t);
-                }
-                finally {
-                    // stop the started contexts to ensure that all scoped
-                    // beans get cleaned up.
-                    if(ctxCtrl != null) {
-                        ctxCtrl.stopContexts();
-                    }
-                }
+                                    Future<V> returnValue = task.call();
+                                    taskFuture.set(returnValue.get());
+                                } catch (Exception e) {
+                                    // TODO log unimportant exceptions as WARN
+                                    // but make sure this doesn't lead to unlogged 500 errors
+                                    log.error(
+                                            "Exception when executing an asynchronous task.", e);
+                                    taskFuture.setException(e);
+                                } catch (Error e) {
+                                    log.error(
+                                            "Error when executing an asynchronous task.", e);
+                                    taskFuture.setException(e);
+                                    throw e;
+                                } finally {
+                                    // stop the started contexts to ensure that all scoped
+                                    // beans get cleaned up.
+                                    if (ctxCtrl != null) {
+                                        ctxCtrl.stopContexts();
+                                    }
+                                }
+                            }
+                        });
             }
         };
         scheduler.execute(runnable);

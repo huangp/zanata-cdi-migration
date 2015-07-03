@@ -17,6 +17,16 @@ import static org.picketlink.idm.model.annotation.IdentityStereotype.Stereotype.
 @IdentityStereotype(USER)
 public class ZanataUser extends User {
 
+    /**
+     * Special system user for which all permission checks succeed.
+     */
+    public static final ZanataUser SYSTEM = new ZanataUser() {
+        @Override
+        public String toString() {
+            return "SYSTEM";
+        }
+    };
+
     private HAccount accountEntity;
 
     public ZanataUser() {
