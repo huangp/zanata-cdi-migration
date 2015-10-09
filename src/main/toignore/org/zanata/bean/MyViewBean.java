@@ -21,8 +21,12 @@
 package org.zanata.bean;
 
 import java.io.Serializable;
+import java.util.Iterator;
 
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.Instance;
 import javax.faces.bean.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -31,6 +35,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.deltaspike.core.api.scope.ViewAccessScoped;
+import org.zanata.model.HPerson;
+import org.zanata.security.annotations.Authenticated;
 import org.zanata.security.annotations.CheckRole;
 import org.zanata.security.annotations.CheckLoggedIn;
 
@@ -56,6 +62,9 @@ public class MyViewBean implements Serializable {
     @Min(5)
     private int age;
 
+    @Inject @Authenticated @Any
+    Instance<HPerson> person;
+
 
     @CheckLoggedIn
     public String getMessage() {
@@ -73,6 +82,14 @@ public class MyViewBean implements Serializable {
     }
 
     public String explicitlyNavigateToPage2() {
+        return null;
+    }
+
+    public HPerson getPerson() {
+        Iterator<HPerson> iterator = person.iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
+        }
         return null;
     }
 }

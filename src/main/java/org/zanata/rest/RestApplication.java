@@ -35,6 +35,7 @@ public class RestApplication extends Application {
     public Set<Class<?>> getClasses() {
         Set<Class<?>> resourceClasses = Sets.newHashSet();
 //        resourceClasses.add(GenericRestResource.class);
+        resourceClasses.add(TestResource.class);
         return resourceClasses;
     }
 }

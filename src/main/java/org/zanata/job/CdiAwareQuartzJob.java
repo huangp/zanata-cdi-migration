@@ -13,13 +13,15 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zanata.bean.SessionStorageBean;
+import org.zanata.model.HPerson;
+import org.zanata.security.annotations.Authenticated;
 import org.zanata.servlet.ServletStuff;
 
 /**
  * @author Patrick Huang
  *         <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
-@Scheduled(cronExpression = "* * * * * ?", onStartup = true, startScopes = {})
+@Scheduled(cronExpression = "* * * * * ?", onStartup = false)
 public class CdiAwareQuartzJob implements org.quartz.Job {
     private static final Logger log =
             LoggerFactory.getLogger(CdiAwareQuartzJob.class);
@@ -28,28 +30,23 @@ public class CdiAwareQuartzJob implements org.quartz.Job {
 //    @Inject
 //    private SessionStorageBean bean;
 
-    @Inject
-    private ServletStuff servletStuff;
+//    @Inject
+//    private ServletStuff servletStuff;
+
+//    @Inject @Authenticated
+//    private HPerson person;
 
     @Override
     public void execute(JobExecutionContext context) throws
             JobExecutionException {
         Date fireTime = context.getFireTime();
         log.info("=== >> firing job at: {}", fireTime);
-        HttpServletRequest request = servletStuff.getRequest();
-        HttpSession session = servletStuff.getSession();
-        HttpServletRequest injectedRequest = servletStuff.getInjectedRequest();
-        HttpSession injectedSession = servletStuff.getInjectedSession();
-        boolean equal = request == injectedRequest && session == injectedSession;
-        log.info("equal: {}", equal);
 
 //        log.info("request is null? {}", request.getContextPath());
 //        log.info("session is null? {}", session.getId());
 //        bean.put("haha", "hoho");
-        SessionStorageBean bean = BeanProvider
-                .getContextualReference(SessionStorageBean.class, true);
-        log.info("session bean should be null: {}", bean);
 
+//        log.info("person: {}", person);
         log.info("=== >> job {} finished",  context.getJobDetail());
     }
 }
