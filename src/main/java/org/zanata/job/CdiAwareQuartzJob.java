@@ -1,10 +1,12 @@
 package org.zanata.job;
 
 import java.util.Date;
+import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.apache.deltaspike.scheduler.api.Scheduled;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -17,14 +19,14 @@ import org.zanata.servlet.ServletStuff;
  * @author Patrick Huang
  *         <a href="mailto:pahuang@redhat.com">pahuang@redhat.com</a>
  */
-@Scheduled(cronExpression = "* * * * * ?", onStartup = true)
+@Scheduled(cronExpression = "* * * * * ?", onStartup = true, startScopes = {})
 public class CdiAwareQuartzJob implements org.quartz.Job {
     private static final Logger log =
             LoggerFactory.getLogger(CdiAwareQuartzJob.class);
 
     // scheduler by default starts request and session scope
-    @Inject
-    private SessionStorageBean bean;
+//    @Inject
+//    private SessionStorageBean bean;
 
     @Inject
     private ServletStuff servletStuff;
@@ -43,7 +45,11 @@ public class CdiAwareQuartzJob implements org.quartz.Job {
 
 //        log.info("request is null? {}", request.getContextPath());
 //        log.info("session is null? {}", session.getId());
-        bean.put("haha", "hoho");
+//        bean.put("haha", "hoho");
+        SessionStorageBean bean = BeanProvider
+                .getContextualReference(SessionStorageBean.class, true);
+        log.info("session bean should be null: {}", bean);
+
         log.info("=== >> job {} finished",  context.getJobDetail());
     }
 }
